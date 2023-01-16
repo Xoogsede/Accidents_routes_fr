@@ -3,6 +3,26 @@ from py2neo import Graph, Node, Relationship
 import folium
 from geopy.geocoders import Nominatim
 
+
+            # df = pd.DataFrame(results[:][:][0][0])
+            # df = df.T.reset_index(drop=True)
+            # for j in results[1:]:
+            #     n=len(df)
+            #     df1 = pd.DataFrame(j)
+            #     df1 = df1.T.reset_index(drop=True)
+            #     df.loc[n]= df1.iloc[0,:]
+            
+            # df = pd.DataFrame.from_records(results["a"]).merge(pd.DataFrame.from_records(results["u"]).merge(pd.DataFrame.from_records(results["v"]), how='inner', on='Num_Acc'), how='inner', on='Num_Acc')
+            
+            # df['An'] = df.An.astype('int')
+            # df['Mois'] = df.Mois.astype('int')
+            # df['Jour'] = df.Jour.astype('int')
+            # df['Heure'] = pd.to_datetime(df['Heure'], format='%H:%M', errors='ignore').dt.time
+            print(df.An.dtype,df.Mois.dtype, df.Jour.dtype, df.Heure.dtype, "a garder")
+            # df['Date'] = pd.to_datetime(df[['An', 'Mois', 'Jour']])
+            # year=df.An, month=df.Mois, day = df.Jour, time = df.Heure
+
+
 graph = Graph(
     host="bolt://localhost:7687",
     user="neo4j",

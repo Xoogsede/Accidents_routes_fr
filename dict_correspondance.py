@@ -1,69 +1,3 @@
-Conditions_atm = {
-    "Non_renseigne":-1,
-	"Normale":1,
-	"Pluie_legere":2,
-	"Pluie_forte":3,
-	"Neige_grele":4,
-	"Brouillard_fumee":5,
-	"Vent_fort_tempete":6,
-	"Temps_eblouissant":7,
-	"Temps_couvert":8,
-	"Autre":9}
-
-Type_de_collision =  {
-	"Non_renseigne":-1,
-	"Deux_vehicules_frontale":1,
-	"Deux_vehicules_par_arriere":2,
-	"Deux_vehicules_par_le_cote":3,
-	"Trois_vehicules_et_plus_en_chaîne":4,
-	"Trois_vehicules_et_plus_collisions_multiple":5,
-	"Autre_collision":6,
-	"Sans_collision":7}
-
-
-Catégorie_du_véhicule = {  
-	0: 'Indéterminable',
-	1: 'Bicyclette',
-	2: 'Cyclomoteur <50cm3',
-	3: 'Voiturette (Quadricycle à moteur carrossé) (anciennement "voiturette ou tricycle à moteur")',
-	4: 'Référence inutilisée depuis 2006 (scooter immatriculé)',
-	5: 'Référence inutilisée depuis 2006 (motocyclette)',
-	6: 'Référence inutilisée depuis 2006 (side-car)',
-	7: 'VL seul',
-	8: 'Référence inutilisée depuis 2006 (VL + caravane)',
-	9: 'Référence inutilisée depuis 2006 (VL + remorque)',
-	10: 'VU seul 1,5T <= PTAC <= 3,5T avec ou sans remorque (anciennement VU seul 1,5T <= PTAC <= 3,5T)',
-	11: 'Référence inutilisée depuis 2006 (VU (10) + caravane)',
-	12: 'Référence inutilisée depuis 2006 (VU (10) + remorque)',
-	13: 'PL seul 3,5T <PTCA <= 7,5T',
-	14: 'PL seul > 7,5T',
-	15: 'PL > 3,5T + remorque',
-	16: 'Tracteur routier seul',
-	17: 'Tracteur routier + semi-remorque',
-	18: 'Référence inutilisée depuis 2006 (transport en commun)',
-	19: 'Référence inutilisée depuis 2006 (tramway)',
-	20: 'Engin spécial',
-	21: 'Tracteur agricole',
-	30: 'Scooter < 50 cm3',
-	31: 'Motocyclette > 50 cm3 et <= 125 cm3 ',
-	32: 'Scooter > 50 cm3 et <= 125 cm3 ',
-	33: 'Motocyclette > 125 cm3 ',
-	34: 'Scooter > 125 cm3 ',
-	35: 'Quad léger <= 50 cm3 (Quadricycle à moteur non carrossé)',
-	36: 'Quad lourd > 50 cm3 (Quadricycle à moteur non carrossé)',
-	37: 'Autobus',
-	38: 'Autocar',
-	39: 'Train ',
-	40: 'Tramway',
-	41: '3RM <= 50 cm3',
-	42: '3RM > 50 cm3 <= 125 cm3',
-	43: '3RM > 125 cm3',
-	50: 'EDP à moteur',
-	60: 'EDP sans moteur',
-	80: 'VAE',
-	99: 'Autre véhicule'}
-
-
 Lumiere = {
 	"Plein_jour":1,
 	"Crepuscule_ou_aube":2,
@@ -432,7 +366,3 @@ def dic_convert(dictionnaire):
 			new_dict = dictionnaire
 	
 	return new_dict
-
-# inversion des clé-valeur
-Catégorie_du_véhicule = dic_convert(Catégorie_du_véhicule)
-print(Categorie_de_route)

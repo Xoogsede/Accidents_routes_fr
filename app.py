@@ -39,7 +39,7 @@ def main():
     
 
     # Connexion à la base de données Neo4j
-    graph = Graph(URI, auth=AUTH)
+    graph = Graph(URI, auth=AUTH, name="accidentdelaroute")
 
     st.title("Recherche d'accidents de la route")
     st.sidebar.title("Paramètres de recherche")
@@ -57,50 +57,48 @@ def main():
         latitude, longitude = geocode_address(address)
         print(latitude, longitude)
         # Exécuter la requête Neo4j pour trouver les accidents dans un rayon autour de l'adresse
-        query = f"""
+        query = f"""        
         WITH point({{latitude: {latitude}, longitude: {longitude}}}) AS pac
-        MATCH (a:Accident)
-        WHERE a.Latitude IS NOT NULL AND a.Longitude IS NOT NULL
-        WITH a, point.distance(point({{latitude: toFloat(a.Latitude), longitude: toFloat(a.Longitude)}}), pac) AS distance
+        MATCH (a:Accident), (u:Usager), (v:Vehicules)
+        WHERE a.Latitude IS NOT NULL AND a.Longitude IS NOT NULL AND a.Num_Acc = u.Num_Acc AND a.Num_Acc = v.Num_Acc
+        WITH a, point.distance(point({{latitude: toFloat(a.Latitude), longitude: toFloat(a.Longitude)}}), pac) AS distance, u, v
         WHERE distance < {radius}
-        RETURN a
+        RETURN a, u, v, distance
+        ORDER BY distance ;
         """
         
-        graph_neo4j = graph.run(query)
-        results = graph_neo4j.data()
-        # convertir les résultats en DataFrame
+        results  = graph.run(query).to_data_frame()
 
+        # convertir les résultats en DataFrame et concaténation
         try:
-            df = pd.DataFrame(results[0])
-            df = df.T.reset_index(drop=True)
-            for j in results[1:]:
-                n=len(df)
-                df1 = pd.DataFrame(j)
-                df1 = df1.T.reset_index(drop=True)
-                df.loc[n]= df1.iloc[0,:]
+            acc = pd.DataFrame.from_records(results["a"])
+            usg = pd.DataFrame.from_records(results["u"])
+            vhc = pd.DataFrame.from_records(results["v"])
+            df = acc.merge(usg.merge(vhc, how='right', on='Num_Acc', suffixes=('_left', '_right')), how='right', on='Num_Acc', suffixes=('_left', '_right'))
         except:
             df = pd.DataFrame()   
-        
-        
         
 
         # Afficher les résultats de la requête sous forme de graphe Neo4j
         st.subheader("Résultats de la requête")
-        if results != []:
+        if results.shape[0] > 0 :
             
             # Récupération des correspondances
             type_meteo = dict_correspondance.Conditions_atm
             typologie = dict_correspondance.Type_de_collision       
 
             # Transformer les données : 
+            
+            df = df.loc[:, ~df.columns.duplicated()]
+            df = df.drop_duplicates()
+            df['occutc'] = df.occutc.fillna(-1)
+
             df['Date'] = df['An'] + '-' + df['Mois'] + '-' + df['Jour'] + ' ' + df['Heure']
+            df['Date'] = pd.to_datetime(df['Date'])            
             
             df["Adresse_postale"] = df.Adresse_postale.str.replace("  ", "")
-
             df["Type_de_collision"] = df.Type_de_collision.astype('int')
             df["Conditions_atmosphériques"] = df.Conditions_atmosphériques.astype('int')
-
-
 
             for k,v in typologie.items():
                 df['Type_de_collision'].replace(v, k.replace('_', " "), inplace=True)
@@ -108,20 +106,21 @@ def main():
             for k,v in type_meteo.items():
                 df['Conditions_atmosphériques'].replace(v, k.replace('_', " "), inplace=True)
             
-            print(df[["Date", "Adresse_postale", "Type_de_collision", "Conditions_atmosphériques"]])
+            st.write(df)
+
+            # print(df[["Date", "Adresse_postale", "Type_de_collision", "Conditions_atmosphériques"]])
             
             
-            g = graph_neo4j.to_subgraph()
-            st.write(g)
             
-            st.dataframe(df[["Date", "Adresse_postale", "Type_de_collision"]], use_container_width =True)
-            vis_format = results[0]
-            # créer un objet de réseau pyvis
-            vis_network = Network(notebook=True)
-            # ajouter les données
-            vis_network.add_nodes(vis_format)
-            # afficher le réseau
-            vis_network.show('accident.html')
+            st.dataframe(df[["Date", "Adresse_postale", "Type_de_collision", "sexe"]], use_container_width =True)
+            # vis_format = results[0]
+            # # créer un objet de réseau pyvis
+            # vis_network = Network(notebook=True)
+            # # ajouter les données
+            # vis_network.add_nodes(vis_format)
+            # # afficher le réseau
+            # vis_network.show('accident.html')
+
             # st.graphviz_chart(figure_or_dot=results, use_container_width=True)
             # st.write("Résultats sur un graphe Neo4j:")
             # st.write(open('accident.html').read(), unsafe_allow_html=True)
@@ -132,11 +131,12 @@ def main():
             st.subheader("Résultats sur une carte")
             # Création de la carte
             map = folium.Map(location=[latitude, longitude], zoom_start=13)
-            folium.Marker([latitude, longitude], popup=address, tooltip="<strong>"f'{address}'"</strong>", icon=folium.Icon(color='red')).add_to(map)
+            folium.Marker([latitude, longitude], popup=address, tooltip="<strong>"f'{address}'"</strong>", 
+                        icon=folium.Icon(color='red')).add_to(map)
             # Ajouter les marqueurs pour les accidents
-            for accident in results:
-                lat = accident['a']['Latitude']
-                lon = accident['a']['Longitude']
+            for _ , accident in acc[['Latitude', 'Longitude']].iterrows():
+                lat = accident['Latitude']
+                lon = accident['Longitude']
                 folium.Marker([lat, lon]).add_to(map)
 
             map.save("carte.html")
@@ -164,7 +164,7 @@ def main():
 
 
             # Conditions atmosphérique
-            st.write("Conditions météo lors des accidents", df[["Conditions_atmosphériques"]].count().tolist()[0])
+            st.write("Conditions météo lors des accidents")
 
             
             

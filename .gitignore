@@ -3,6 +3,15 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,windows,visualstudiocode,flask,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,windows,visualstudiocode,flask,node
 
+### Streamlit app ###
+.brouillon.py
+carte.html
+.streamlit/*
+secrets.toml
+
+
+
+
 ### Flask app ###
 instance/*
 !instance/.gitignore
@@ -25,8 +34,7 @@ genalgo.ipynb
 __pycache__/
 *.py[cod]
 *$py.class
-.streamlit/*
-secrets.toml
+
 # C extensions
 *.so
 
