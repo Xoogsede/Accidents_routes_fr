@@ -14,17 +14,24 @@ CREATE (a:Accident {
     An : line.an,
     Heure : line.hrmn,
     Lumière : line.lum,
-    Département : line.dep,
+    Département : CASE WHEN line.dep='2A' or line.dep='2B' THEN '20'   
+                      ELSE CASE WHEN SIZE(line.dep)=1 THEN ("0"+line.dep) 
+                                else line.dep END
+                  END,
     Commune : line.com,
     Localisation : line.agg,
     Intersection : line.int,
     Conditions_atmosphériques : line.atm,
     Type_de_collision : line.col,
     Adresse_postale : line.adr,
-    Latitude : line.lat,
-    Longitude : line.long
+    Latitude : ToFloat(line.lat),
+    Longitude : ToFloat(line.long)
  })
  RETURN count(*) ;// retourne le nombre de nœuds créés
+
+//Conversion de la latitude et de la longitude en réel (au chargement c'est en chaine de caractère)
+MATCH (a:Accident)
+SET a.Latitude = toFloat(a.Latitude), a.Longitude = toFloat(a.Longitude);
 
 
 // créer une contrainte qui garantit que la propriété Num_Acc est unique pour les nœuds de type Accident
@@ -61,6 +68,9 @@ vma: row.vma
 })
 RETURN count(*) ; // retourne le nombre de nœuds créés
 
+//Conversion de la latitude et de la longitude en réel (au chargement c'est en chaine de caractère)
+MATCH (li:Lieux)
+SET li.lartpc = toFloat(li.lartpc), li.larrout = toFloat(li.larrout), li.pr1 = toFloat(li.pr1);
 
 // créer une contrainte qui garantit que la propriété Num_Acc est unique pour les nœuds de type Lieux
 CREATE CONSTRAINT FOR (li:Lieux) REQUIRE li.Num_Acc IS UNIQUE; 
@@ -107,10 +117,11 @@ occutc: row.occutc
 })
 RETURN count(*) ;// retourne le nombre de nœuds créés
 
+MATCH (v:Vehicules)
+SET v.occutc = toFloat(v.occutc);
 
 // créer une contrainte qui garantit que la propriété id_vehicule est unique pour les nœuds de type Vehicules
 CREATE CONSTRAINT FOR (v:Vehicules) REQUIRE v.id_vehicule IS UNIQUE;
-
 
 
 // Création de relations entre les nœuds de type "Usager" et "Vehicules" en utilisant la propriété commune "Num_Acc"
@@ -141,12 +152,6 @@ WHERE a.Num_Acc = l.Num_Acc
 CALL db.schema.visualization()
 
 
-
-MATCH (a:Accident)
-WHERE distance(point({latitude:a.Latitude, longitude:a.Longitude}), point({latitude: <latitude_of_address>, longitude: <longitude_of_address>})) < <distance_in_km>
-RETURN a;
-
-
 // Pour mettre à jour tous les noeux Accident en une fois depuis un fichier csv
 LOAD CSV WITH HEADERS FROM 'file:///caracteristiques.csv' AS line FIELDTERMINATOR ";"
 MATCH (a:Accident {Num_Acc: line.Num_Acc})
@@ -167,10 +172,6 @@ SET a.Num_Acc = line.Num_Acc,
     a.Longitude = line.long
  RETURN count(*) ;// retourne le nombre de nœuds créés
 
-
-//Conversion de la latitude et de la longitude en réel (au chargement c'est en chaine de caractère)
-MATCH (a:Accident)
-SET a.Latitude = toFloat(a.Latitude), a.Longitude = toFloat(a.Longitude);
 
 
 // Accident ayant impliqué le plus de véhicules et de victimes
@@ -214,6 +215,7 @@ RETURN a.Adresse_postale, distance
 ORDER BY distance
 LIMIT 100;
 
+
 // Si les données comportent des adresses sans les coordonnées GPS on les créé avec cette fonction
 MATCH (a:Accident)
 WHERE a.Adresse_postale IS NOT NULL AND a.Latitude IS NULL
@@ -223,7 +225,9 @@ SET a.Latitude = location.latitude
 SET a.Longitude = location.longitude;
 
 
+// Les 5 départements les plus accidentogène
+MATCH (a:Accident) RETURN a.`Département`, count(*) as nb ORDER BY nb DESC LIMIT 5
 
 
-
-
+// si on souhaite réinitialiser le mot de passe une fois l'autentification déactivé dans le fichier config
+ALTER USER neo4j SET PASSWORD "nouveau_mdp"
