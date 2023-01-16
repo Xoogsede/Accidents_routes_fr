@@ -5,6 +5,7 @@
 
 ### Streamlit app ###
 .brouillon.py
+.brouillon.py
 carte.html
 .streamlit/*
 .streamlit/secrets.toml
