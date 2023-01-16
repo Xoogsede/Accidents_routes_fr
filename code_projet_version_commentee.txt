@@ -24,8 +24,8 @@ CREATE (a:Accident {
     Conditions_atmosphériques : line.atm,
     Type_de_collision : line.col,
     Adresse_postale : line.adr,
-    Latitude : ToFloat(line.lat),
-    Longitude : ToFloat(line.long)
+    Latitude : line.lat,
+    Longitude : line.long
  })
  RETURN count(*) ;// retourne le nombre de nœuds créés
 
@@ -152,28 +152,6 @@ WHERE a.Num_Acc = l.Num_Acc
 CALL db.schema.visualization()
 
 
-// Pour mettre à jour tous les noeux Accident en une fois depuis un fichier csv
-LOAD CSV WITH HEADERS FROM 'file:///caracteristiques.csv' AS line FIELDTERMINATOR ";"
-MATCH (a:Accident {Num_Acc: line.Num_Acc})
-SET a.Num_Acc = line.Num_Acc,
-    a.Jour = line.jour,
-    a.Mois = line.mois,
-    a.An = line.an,
-    a.Heure = line.hrmn,
-    a.Lumière = line.lum,
-    a.Département = line.dep,
-    a.Commune = line.com,
-    a.Localisation = line.agg,
-    a.Intersection = line.int,
-    a.Conditions_atmosphériques = line.atm,
-    a.Type_de_collision = line.col,
-    a.Adresse_postale = line.adr,
-    a.Latitude = line.lat,
-    a.Longitude = line.long
- RETURN count(*) ;// retourne le nombre de nœuds créés
-
-
-
 // Accident ayant impliqué le plus de véhicules et de victimes
 MATCH (n)
 RETURN n, size([(n)-[r]->() | r]) as degree
@@ -193,16 +171,6 @@ WITH a, count(r) as degree
 RETURN a, degree
 ORDER BY degree DESC
 LIMIT 1;
-
-
-MATCH (n:Accident)
-WHERE n.An IS NOT NULL
-WITH n, month(n.date) as month
-RETURN month, count(*) as accident_count
-ORDER BY accident_count DESC
-LIMIT 1;
-
-
 
 // Pour rechercher tous les accident autour d'un point 
 // remplacer les latitude et longitude de la première ligne par celles du point d'intérêt
@@ -229,5 +197,3 @@ SET a.Longitude = location.longitude;
 MATCH (a:Accident) RETURN a.`Département`, count(*) as nb ORDER BY nb DESC LIMIT 5
 
 
-// si on souhaite réinitialiser le mot de passe une fois l'autentification déactivé dans le fichier config
-ALTER USER neo4j SET PASSWORD "nouveau_mdp"
