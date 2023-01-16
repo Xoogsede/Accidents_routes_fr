@@ -3,7 +3,6 @@ server.memory.heap.max_size=4096m
 dbms.memory.transaction.total.max=104857600000m
 db.memory.transaction.max=160000000m
 
-
 // Chargement des données depuis un fichier CSV "caracteristiques.csv"
 LOAD CSV WITH HEADERS FROM 'file:///caracteristiques.csv' AS line FIELDTERMINATOR ";"
 WITH line WHERE line.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
