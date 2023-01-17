@@ -6,7 +6,7 @@ from pyvis.network import Network
 from streamlit_folium import folium_static 
 import pandas as pd
 import matplotlib.pyplot as plt
-import dict_correspondance 
+from  dict_correspondance import *
 import seaborn as sns
 
 
@@ -84,8 +84,8 @@ def main():
         if results.shape[0] > 0 :
             
             # Récupération des correspondances
-            type_meteo = dict_correspondance.Conditions_atm
-            typologie = dict_correspondance.Type_de_collision       
+            type_meteo = dic_convert(Conditions_atm)
+            typologie = dic_convert(Type_de_collision)     
 
             # Transformer les données : 
             
@@ -106,7 +106,7 @@ def main():
             for k,v in type_meteo.items():
                 df['Conditions_atmosphériques'].replace(v, k.replace('_', " "), inplace=True)
             
-            st.write(df)
+            st.write(df[["Date", "Adresse_postale", "Type_de_collision", "Conditions_atmosphériques"]])
 
             # print(df[["Date", "Adresse_postale", "Type_de_collision", "Conditions_atmosphériques"]])
             

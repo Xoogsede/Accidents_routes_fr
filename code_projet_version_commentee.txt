@@ -1,8 +1,8 @@
 //Les paramettre à modifier dans le fichier config:
-server.memory.heap.max_size=4096m
-dbms.memory.transaction.total.max=104857600000m
-db.memory.transaction.max=160000000m
 
+//server.memory.heap.max_size=4096m
+//dbms.memory.transaction.total.max=104857600000m
+//db.memory.transaction.max=160000000m
 
 // Chargement des données depuis un fichier CSV "caracteristiques.csv"
 LOAD CSV WITH HEADERS FROM 'file:///caracteristiques.csv' AS line FIELDTERMINATOR ";"
@@ -127,29 +127,41 @@ CREATE CONSTRAINT FOR (v:Vehicules) REQUIRE v.id_vehicule IS UNIQUE;
 // Création de relations entre les nœuds de type "Usager" et "Vehicules" en utilisant la propriété commune "Num_Acc"
 MATCH (u:Usager), (v:Vehicules)
 WHERE u.Num_Acc = v.Num_Acc
-CREATE (u)-[:EST_PRESENT]->(v);
+  MERGE (u)-[:EST_PRESENT]->(v);
 
 
 // Création de relations entre les nœuds de type "Usager" et "Accident" en utilisant la propriété commune "Num_Acc"
 MATCH (u:Usager), (a:Accident)
 WHERE u.Num_Acc = a.Num_Acc
-  CREATE (u)-[:EST_CONCERNE]->(a);
+  MERGE (u)-[:EST_CONCERNE]->(a);
 
 
 
 // Création de relations entre les nœuds de type "Accident" et "Vehicules" en utilisant la propriété commune "Num_Acc"
 MATCH (a:Accident), (v:Vehicules)
 WHERE a.Num_Acc = v.Num_Acc
-  CREATE (a)-[:IMPLIQUE]->(v);
+  MERGE (a)-[:IMPLIQUE]->(v);
 
 
 // Création de relations entre les nœuds de type "Accident" et "Lieux" en utilisant la propriété commune "Num_Acc"
 MATCH (a:Accident), (l:Lieux)
 WHERE a.Num_Acc = l.Num_Acc
-  CREATE (a)-[:EST_LOCALISE]->(l);
+  MERGE (a)-[:EST_LOCALISE]->(l);
+
+
+// Recherche des relations multiples 
+MATCH (a)-[r]->(b) WITH a, b, COUNT(r) AS c WHERE c>1 RETURN a, b, c
+
+// Suppression des relations multiples
+MATCH (a)-[r]->(b)
+WITH a, b, r
+ORDER BY r.Num_Acc DESC
+WITH a, b, collect(r)[1..] as rels
+UNWIND rels as r
+DELETE r
 
 // Vue d'ensemble des relations
-CALL db.schema.visualization()
+CALL db.schema.visualization();
 
 
 // Accident ayant impliqué le plus de véhicules et de victimes
@@ -196,4 +208,48 @@ SET a.Longitude = location.longitude;
 // Les 5 départements les plus accidentogène
 MATCH (a:Accident) RETURN a.`Département`, count(*) as nb ORDER BY nb DESC LIMIT 5
 
+//Classement des fréquences d'accident par année et mois entre 2019 et 2020 en fonction du nombre de personnes impliquées et de leur état
+MATCH (u:Usager)-[r:EST_CONCERNE]->(a:Accident)
+RETURN ToInteger(a.An) AS Annee,ToInteger(a.Mois) AS mois, 
+    COUNT (distinct(a.Num_Acc)) AS nombre_accident , 
+    COUNT (a.Num_Acc)AS nombre_personne_impliqué,
+    SUM(CASE WHEN(u.grav="1") THEN 1 ELSE 0 END) AS dont_indemne,
+    SUM(CASE WHEN(u.grav="2") THEN 1 ELSE 0 END) AS dont_décédée,
+    SUM(CASE WHEN(u.grav="3") THEN 1 ELSE 0 END) AS dont_hospitalisé,
+    SUM(CASE WHEN(u.grav="4") THEN 1 ELSE 0 END) AS dont_blessé_léger,
+    SUM(CASE WHEN(u.grav=" -1") THEN 1 ELSE 0 END) AS non_renseigné
+ORDER BY nombre_accident DESC
 
+
+//Profil Conducteur les plus à risque
+MATCH (u:Usager)-[r:EST_CONCERNE]->(a:Accident) 
+WHERE a.An IS NOT NULL // à modifier si 
+AND  u.an_nais IS NOT NULL 
+AND u.catu = "1" 
+    RETURN  CASE WHEN u.sexe="1" THEN"Homme"
+        ELSE CASE WHEN u.sexe="2" THEN "Femme" ELSE "non renseigné" END 
+        END AS sexe, 
+        (ToInteger(a.An)-Tointeger(u.an_nais)) AS Age,
+        COUNT(*) AS nb_accident 
+        ORDER BY nb_accident DESC
+
+
+//lieux des accidents en fonction des catégories de route sur les 5 départements en Hauts-de-France : Aisne (02),Nord (59),Oise (60),Pas-de-Calais (62),Somme (80)
+WITH ["59", "62", "80", "02", "60"] as dep
+MATCH (a:Accident)
+WHERE ANY (i IN dep WHERE i = a.`Département`) 
+MATCH (a:Accident)-[:EST_LOCALISE]->(l:Lieux)
+RETURN CASE l.Categorie 
+WHEN "1" THEN "Autoroute" 
+      WHEN "2" THEN"Route_nationale" 
+         WHEN "3" THEN"Route_Departementale"
+             WHEN "4" THEN "Voie_Communales"
+                 WHEN  "5" THEN "Hors_reseau_public"
+                     WHEN "6" THEN "Parc_de_stationnement_ouvert_a_la_circulation_publique"
+                         WHEN "7" THEN "Routes_de_metropole_urbaine" 
+                             WHEN "9" THEN "autre__voie__Numero_de_la_route." 
+                                 END AS Catégorie_route , count(a.Num_Acc) AS nb_accident
+
+
+MATCH (n) WHERE n.Latitude IS NOT NULL
+RETURN n.Latitude as latitude, n.Longitude as longitude, n.commune as tooltip

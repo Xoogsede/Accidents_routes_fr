@@ -2,7 +2,6 @@ altair==4.2.0
 asttokens==2.2.1
 attrs==22.2.0
 backcall==0.2.0
-backports.zoneinfo==0.2.1
 blinker==1.5
 branca==0.6.0
 cachetools==5.2.1
@@ -83,3 +82,4 @@ validators==0.20.0
 watchdog==2.2.1
 wcwidth==0.2.5
 zipp==3.11.0
+backports.zoneinfo==0.2.1

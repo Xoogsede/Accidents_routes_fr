@@ -260,16 +260,19 @@ Type_motorisation_vehicule = {
 #usager
 
 Categorie_usager = {
+	-1: 'Non renseigné',
 	'Conducteur':1,
 	'Passager':2,
 	'Piéton':3}
 Gravite_blessure_usager = {
+	
 	1: 'Indemne',
 	2: 'Tué',
 	3: 'Blessé hospitalisé',
 	4: 'Blessé léger'}
 
 Sexe_usager = {
+	-1: 'Non renseigné',
 	1: 'Masculin',
 	2: 'Féminin'}
 
