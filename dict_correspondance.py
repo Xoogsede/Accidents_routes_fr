@@ -131,7 +131,7 @@ Sens_circulation=  {
 	3: 'Absence de repère'}
 
 
-Catégorie_du_véhicule = {
+Categorie_du_vehicule = {
 	0: 'Indéterminable',
 	1: 'Bicyclette',
 	2: 'Cyclomoteur <50cm3',

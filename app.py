@@ -98,7 +98,7 @@ def main():
             
             df["Adresse_postale"] = df.Adresse_postale.str.replace("  ", "")
             df["Type_de_collision"] = df.Type_de_collision.astype('int')
-            df["Conditions_atmosphériques"] = df.Conditions_atmosphériques.astype('int')
+            df["Conditions_atmosphériques"] = df["Conditions_atmosphériques"].astype('int')
 
             for k,v in typologie.items():
                 df['Type_de_collision'].replace(v, k.replace('_', " "), inplace=True)
