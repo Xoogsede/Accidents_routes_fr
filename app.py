@@ -128,11 +128,11 @@ def main():
             # # ajouter les données
             # vis_network.add_nodes(vis_format)
             # # afficher le réseau
-            # vis_network.show('accident.html')
+            # vis_network.show('static/accident.html')
 
             # st.graphviz_chart(figure_or_dot=results, use_container_width=True)
             # st.write("Résultats sur un graphe Neo4j:")
-            # st.write(open('accident.html').read(), unsafe_allow_html=True)
+            # st.write(open('static/accident.html').read(), unsafe_allow_html=True)
 
 
             st.title("Localisation géographique")
@@ -148,7 +148,7 @@ def main():
                 lon = accident['Longitude']
                 folium.Marker([lat, lon]).add_to(map)
 
-            map.save("carte.html")
+            map.save("static/carte.html")
             folium_static(map)            
 
 
