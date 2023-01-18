@@ -59,7 +59,7 @@ def main():
     dt_fin = st.sidebar.date_input(label="date de fin", label_visibility='visible', key="fin")
 
     # Saisie du rayon de recherche
-    radius = st.sidebar.number_input("Rayon de recherche (en mètres)", min_value=0, max_value=100000, value=1000)
+    radius = st.sidebar.number_input("Rayon de recherche (en mètres)", min_value=0, max_value=1000000, value=1000)
 
     if st.button("Rechercher") and address!="":
         # Convertir l'adresse en coordonnées
@@ -100,7 +100,7 @@ def main():
             
             df = df.loc[:, ~df.columns.duplicated()]
             df = df.drop_duplicates()
-            df['occutc'] = df.occutc.fillna(-1)
+            # df['occutc'] = df.occutc.fillna(-1)
 
             df['Date'] = df['An'] + '-' + df['Mois'] + '-' + df['Jour'] + ' ' + df['Heure']
             df['Date'] = pd.to_datetime(df['Date'])            

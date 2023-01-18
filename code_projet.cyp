@@ -99,6 +99,9 @@ etatp: row.etatp
 RETURN count(*); // retourne le nombre de nœuds créés
 
 
+// créer une contrainte qui garantit que la propriété id est unique pour les nœuds de type Usager
+CREATE CONSTRAINT FOR (u:Usager) REQUIRE u.id IS UNIQUE; 
+
 // Chargement des données depuis un fichier CSV "vehicules.csv"
 LOAD CSV WITH HEADERS FROM "file:///vehicules.csv" AS row FIELDTERMINATOR ";"
 WITH row WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
@@ -208,6 +211,12 @@ SET a.Longitude = location.longitude;
 // Les 5 départements les plus accidentogène
 MATCH (a:Accident) RETURN a.`Département`, count(*) as nb ORDER BY nb DESC LIMIT 5
 
+
+//Classement des fréquences d'accident par année et mois entre 2019 et 2020 
+MATCH (n:Accident) 
+RETURN n.An as Annee,n.Mois AS mois, COUNT (*) AS nombre_accident 
+ORDER BY nombre_accident DESC
+
 //Classement des fréquences d'accident par année et mois entre 2019 et 2020 en fonction du nombre de personnes impliquées et de leur état
 MATCH (u:Usager)-[r:EST_CONCERNE]->(a:Accident)
 RETURN ToInteger(a.An) AS Annee,ToInteger(a.Mois) AS mois, 
@@ -251,5 +260,74 @@ WHEN "1" THEN "Autoroute"
                                  END AS Catégorie_route , count(a.Num_Acc) AS nb_accident
 
 
-MATCH (n) WHERE n.Latitude IS NOT NULL
-RETURN n.Latitude as latitude, n.Longitude as longitude, n.commune as tooltip
+// répartition mensuelle des accidents en fonction des condidtions météorologique
+MATCH (a:Accident)
+WHERE a.Mois IS NOT NULL AND  a.`Conditions_atmosphériques`IS NOT NULL
+
+WITH a.`Conditions_atmosphériques` AS Meteo, a.Mois AS M, COUNT(a.Num_Acc) AS nb
+WITH Meteo, apoc.map.fromLists(COLLECT(M), COLLECT(nb)) AS piv
+RETURN CASE Meteo 
+WHEN "1" THEN "Normale" 
+      WHEN "2" THEN "Pluie_legere" 
+         WHEN "3" THEN "Pluie_forte"
+             WHEN "4" THEN "Neige_grele"
+                 WHEN  "5" THEN "Brouillard_fumee"
+                     WHEN "6" THEN "Vent_fort_tempete"
+                         WHEN "7" THEN "Temps_eblouissant"
+					WHEN "8" THEN "Temps_couvert"
+                         		WHEN "9" THEN "Autre" 
+							WHEN " -1" THEN "non renseignée" end as Meteo ,
+  piv["01"] AS Janv,
+  piv["02"] AS Fev,
+  piv["03"] AS Mars,
+  piv["04"] AS Avr,
+  piv["05"] AS Mai,
+  piv["06"] AS Juin,
+  piv["07"] AS Juill,
+  piv["08"] AS Aout,
+  piv["09"] AS Sept,
+  piv["10"] AS Oct,
+  piv["11"] AS Nov,
+  piv["12"] AS Dec
+
+// visualisation des pietons décédés lors d'un accident impliquant 1 ou plusieurs véhicule
+
+MATCH(u:Usager {catu:"3",grav:"2"})-[r:EST_PRESENT]->(v:Vehicules)
+return u,r,v
+
+// répartition annuelle des accidents en fonction de l'éclairage et de localisation
+
+
+MATCH (a:Accident)
+WHERE a.An IS NOT NULL 
+
+WITH a.`Lumière`AS e , a.Localisation AS l,a.An AS A, COUNT(a.Num_Acc) AS nb
+WITH e,l, apoc.map.fromLists(COLLECT(A), COLLECT(nb)) AS piv
+RETURN 
+
+CASE l 
+WHEN "1" THEN "Hors agglomération " 
+      WHEN "2" THEN "En agglomération " end as Localisalion,
+CASE e 
+WHEN "1" THEN "Plein jour" 
+      WHEN "2" THEN "Crépuscule ou aube" 
+         WHEN "3" THEN "Nuit sans éclairage public"
+             WHEN "4" THEN "Nuit avec éclairage public non allumé"
+                 WHEN  "5" THEN "Nuit avec éclairage public allumée"
+                     WHEN " -1" THEN "non renseignée" end as Eclairage ,
+
+  piv["2019"] AS An_2019,
+  piv["2020"] AS An_2020,
+  piv["2021"] AS An_2021
+      
+ORDER BY Localisalion,Eclairage
+
+// visualiser les accidents impliquant jusqu'à 6 véhicules
+MATCH(a:Accident)-[r:IMPLIQUE*1..6]->(v:Vehicules)
+return a,v
+
+//Visualiser les accidents impliquant 3 véhicules et plus et dont l'un deux est un vélo
+WITH ["4", "5"] as col
+MATCH (a:Accident)
+WHERE ANY (i IN col WHERE i = a.Type_de_collision )
+
