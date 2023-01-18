@@ -7,9 +7,10 @@
 .brouillon.py
 .brouillon.py
 carte.html
-!.streamlit/
-.streamlit/secrets.toml
 .streamlit/*
+!.streamlit/
+!.streamlit/secrets.toml
+
 carte.html
 
 
