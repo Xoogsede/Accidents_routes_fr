@@ -5,29 +5,32 @@
 //db.memory.transaction.max=160000000m
 
 // Chargement des données depuis un fichier CSV "caracteristiques.csv"
-LOAD CSV WITH HEADERS FROM 'https://github.com/Xoogsede/Accidents_routes_fr/tree/main/data/caracteristiques.csv' AS line FIELDTERMINATOR ";"
-WITH line WHERE line.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
+LOAD CSV WITH HEADERS FROM 'https://github.com/Xoogsede/Accidents_routes_fr/blob/main/data/caracteristiques.csv?raw=true' AS line FIELDTERMINATOR ";"
+CALL {
+WITH line 
+WITH line AS line
+WHERE line.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
 CREATE (a:Accident { 
-    Num_Acc : line.Num_Acc,
-    Jour : line.jour,
-    Mois : line.mois,
-    An : line.an,
-    Heure : line.hrmn,
-    Lumière : line.lum,
-    Département : CASE WHEN line.dep='2A' or line.dep='2B' THEN '20'   
+    Num_Acc : toInteger(line.Num_Acc),
+    Jour : toInteger(line.jour),
+    Mois : toInteger(line.mois),
+    An : toInteger(line.an),
+    Heure : toInteger(line.hrmn),
+    Lumière : toInteger(line.lum),
+    Département : toInteger(CASE WHEN line.dep='2A' or line.dep='2B' THEN '20'   
                       ELSE CASE WHEN SIZE(line.dep)=1 THEN ("0"+line.dep) 
                                 else line.dep END
-                  END,
-    Commune : line.com,
-    Localisation : line.agg,
-    Intersection : line.int,
-    Conditions_atmosphériques : line.atm,
-    Type_de_collision : line.col,
+                  END),
+    Commune : toInteger(line.com),
+    Localisation : toInteger(line.agg),
+    Intersection : toInteger(line.int),
+    Conditions_atmosphériques : toInteger(line.atm),
+    Type_de_collision : toInteger(line.col),
     Adresse_postale : line.adr,
-    Latitude : line.lat,
-    Longitude : line.long
- })
- RETURN count(*) ;// retourne le nombre de nœuds créés
+    Latitude : toFloat(line.lat),
+    Longitude : toFloat(line.long)
+ })} IN TRANSACTIONS OF 500 ROWS
+ RETURN COUNT(*) ;// retourne le nombre de nœuds créés
 
 //Conversion de la latitude et de la longitude en réel (au chargement c'est en chaine de caractère)
 MATCH (a:Accident)
@@ -44,8 +47,11 @@ CREATE INDEX FOR (a:Accident) ON (a.Longitude);
 
 
 // Chargement des données depuis un fichier CSV "lieux.csv"
-LOAD CSV WITH HEADERS FROM "https://github.com/Xoogsede/Accidents_routes_fr/tree/main/data/lieux.csv" AS row FIELDTERMINATOR ";"
-WITH row WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/lieux.csv" AS row FIELDTERMINATOR ";"
+CALL {
+WITH row 
+WITH row AS row
+WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
 CREATE (li:Lieux {
 Num_Acc: row.Num_Acc,
 Categorie: row.catr,
@@ -65,8 +71,11 @@ surf: row.surf,
 infra: row.infra,
 situ: row.situ,
 vma: row.vma
-})
+})} IN TRANSACTIONS OF 500 ROWS
 RETURN count(*) ; // retourne le nombre de nœuds créés
+
+MATCH (li:Lieux)
+SET li.Num_Acc = toInteger(li.Num_Acc)
 
 //Conversion de la latitude et de la longitude en réel (au chargement c'est en chaine de caractère)
 MATCH (li:Lieux)
@@ -77,8 +86,11 @@ CREATE CONSTRAINT FOR (li:Lieux) REQUIRE li.Num_Acc IS UNIQUE;
 
 
 // Chargement des données depuis un fichier CSV "usagers.csv"
-LOAD CSV WITH HEADERS FROM "https://github.com/Xoogsede/Accidents_routes_fr/tree/main/data/usagers.csv" AS row FIELDTERMINATOR ";"
-WITH row WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/usagers.csv" AS row FIELDTERMINATOR ";"
+CALL {
+WITH row 
+WITH row AS row
+WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
 CREATE (u:Usager {
 Num_Acc: row.Num_Acc,
 id_vehicule: row.id_vehicule,
@@ -95,16 +107,20 @@ secu3: row.secu3,
 locp: row.locp,
 actp: row.actp,
 etatp: row.etatp
-})
+})} IN TRANSACTIONS OF 500 ROWS
 RETURN count(*); // retourne le nombre de nœuds créés
 
-
+MATCH (u:Usager)
+SET u.Num_Acc = toInteger(u.Num_Acc)
 // créer une contrainte qui garantit que la propriété id est unique pour les nœuds de type Usager
 CREATE CONSTRAINT FOR (u:Usager) REQUIRE u.id IS UNIQUE; 
 
 // Chargement des données depuis un fichier CSV "vehicules.csv"
-LOAD CSV WITH HEADERS FROM "https://github.com/Xoogsede/Accidents_routes_fr/tree/main/data/vehicules.csv" AS row FIELDTERMINATOR ";"
-WITH row WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
+LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/vehicules.csv" AS row FIELDTERMINATOR ";"
+CALL {
+WITH row 
+WITH row AS row
+WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
 CREATE (v:Vehicules {
 Num_Acc: row.Num_Acc, 
 id_vehicule: row.id_vehicule, 
@@ -117,8 +133,12 @@ choc: row.choc,
 manv: row.manv, 
 motor: row.motor, 
 occutc: row.occutc
-})
+})} IN TRANSACTIONS OF 500 ROWS
 RETURN count(*) ;// retourne le nombre de nœuds créés
+
+
+MATCH (v:Vehicules)
+SET v.Num_Acc = toInteger(v.Num_Acc)
 
 MATCH (v:Vehicules)
 SET v.occutc = toFloat(v.occutc);
