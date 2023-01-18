@@ -331,3 +331,7 @@ WITH ["4", "5"] as col
 MATCH (a:Accident)
 WHERE ANY (i IN col WHERE i = a.Type_de_collision )
 
+
+MATCH (l:Lieux )<-[r2:EST_LOCALISE]-(a: Accident)<-[r:EST_CONCERNE]-(u:Usager)
+WHERE a.An='2021'  AND l.Categorie="1" AND u.grav="3"
+RETURN a.Latitude AS Latitude ,a.Longitude AS longitude
