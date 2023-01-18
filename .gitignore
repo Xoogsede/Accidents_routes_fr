@@ -7,8 +7,8 @@
 .brouillon.py
 .brouillon.py
 carte.html
-.streamlit/*
-!.streamlit/
+streamlit/*
+streamlit/
 
 carte.html
 
