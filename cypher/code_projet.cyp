@@ -5,7 +5,7 @@
 //db.memory.transaction.max=160000000m
 
 // Chargement des données depuis un fichier CSV "caracteristiques.csv"
-LOAD CSV WITH HEADERS FROM 'file:///caracteristiques.csv' AS line FIELDTERMINATOR ";"
+LOAD CSV WITH HEADERS FROM 'https://github.com/Xoogsede/Accidents_routes_fr/tree/main/data/caracteristiques.csv' AS line FIELDTERMINATOR ";"
 WITH line WHERE line.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
 CREATE (a:Accident { 
     Num_Acc : line.Num_Acc,
@@ -44,7 +44,7 @@ CREATE INDEX FOR (a:Accident) ON (a.Longitude);
 
 
 // Chargement des données depuis un fichier CSV "lieux.csv"
-LOAD CSV WITH HEADERS FROM "file:///lieux.csv" AS row FIELDTERMINATOR ";"
+LOAD CSV WITH HEADERS FROM "https://github.com/Xoogsede/Accidents_routes_fr/tree/main/data/lieux.csv" AS row FIELDTERMINATOR ";"
 WITH row WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
 CREATE (li:Lieux {
 Num_Acc: row.Num_Acc,
@@ -77,7 +77,7 @@ CREATE CONSTRAINT FOR (li:Lieux) REQUIRE li.Num_Acc IS UNIQUE;
 
 
 // Chargement des données depuis un fichier CSV "usagers.csv"
-LOAD CSV WITH HEADERS FROM "file:///usagers.csv" AS row FIELDTERMINATOR ";"
+LOAD CSV WITH HEADERS FROM "https://github.com/Xoogsede/Accidents_routes_fr/tree/main/data/usagers.csv" AS row FIELDTERMINATOR ";"
 WITH row WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
 CREATE (u:Usager {
 Num_Acc: row.Num_Acc,
@@ -103,7 +103,7 @@ RETURN count(*); // retourne le nombre de nœuds créés
 CREATE CONSTRAINT FOR (u:Usager) REQUIRE u.id IS UNIQUE; 
 
 // Chargement des données depuis un fichier CSV "vehicules.csv"
-LOAD CSV WITH HEADERS FROM "file:///vehicules.csv" AS row FIELDTERMINATOR ";"
+LOAD CSV WITH HEADERS FROM "https://github.com/Xoogsede/Accidents_routes_fr/tree/main/data/vehicules.csv" AS row FIELDTERMINATOR ";"
 WITH row WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
 CREATE (v:Vehicules {
 Num_Acc: row.Num_Acc, 
