@@ -2,7 +2,7 @@ import streamlit as st
 from py2neo import Graph
 from geopy.geocoders import Nominatim
 import folium
-from pyvis.network import Network
+# from pyvis.network import Network
 from streamlit_folium import folium_static 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -28,14 +28,16 @@ def geocode_address(address):
 # Création de Neo4jRepository object
 neo4j_uri       = os.environ.get('neo4j_uri')
 neo4j_user      = os.environ.get('neo4j_user')
-neo4j_password  =os.environ.get('neo4j_password')
+neo4j_password  = os.environ.get('neo4j_password')
 
 try:
     URI = neo4j_uri
     AUTH = (neo4j_user, neo4j_password)
+    print(URI, AUTH)
 except:
     URI = st.secrets['neo4j_uri']
-    AUTH = (st.secrets['neo4j_user'], st.secrets['neo4j_password'])    
+    AUTH = (st.secrets['neo4j_user'], st.secrets['neo4j_password'])
+    print(URI, AUTH)    
 else:
     print('Connexion avec secrets streamlit')
 
@@ -48,7 +50,7 @@ def main():
     
 
     # Connexion à la base de données Neo4j
-    graph = Graph(URI, auth=AUTH, name="neo4j")
+    graph = Graph(profile=URI, auth=AUTH)
 
     st.title("Recherche d'accidents de la route")
     st.sidebar.title("Paramètres de recherche")
