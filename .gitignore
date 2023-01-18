@@ -7,10 +7,9 @@
 .brouillon.py
 .brouillon.py
 carte.html
-
-.streamlit/secrets.toml
+.streamlit/*
+!.streamlit/
 carte.html
-
 
 
 ### Flask app ###
