@@ -9,7 +9,6 @@
 carte.html
 .streamlit/*
 !.streamlit/
-!.streamlit/secrets.toml
 
 carte.html
 
