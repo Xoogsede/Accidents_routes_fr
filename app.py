@@ -50,7 +50,7 @@ def main():
     
 
     # Connexion à la base de données Neo4j
-    graph = Graph(profile=URI, auth=AUTH)
+    graph = Graph(URI, auth=AUTH, routing = True)
 
     st.title("Recherche d'accidents de la route")
     st.sidebar.title("Paramètres de recherche")

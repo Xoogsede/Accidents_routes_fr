@@ -4,32 +4,46 @@
 //dbms.memory.transaction.total.max=104857600000m
 //db.memory.transaction.max=160000000m
 
+// créer une contrainte qui garantit que la propriété Num_Acc est unique pour les nœuds de type Accident
+CREATE CONSTRAINT IF NOT EXISTS FOR (a:Accident)  REQUIRE a.Num_Acc IS UNIQUE; 
+
+// créer une contrainte qui garantit que la propriété Num_Acc est unique pour les nœuds de type Lieux
+CREATE CONSTRAINT IF NOT EXISTS FOR (li:Lieux) REQUIRE li.Num_Acc IS UNIQUE; 
+
+// créer une contrainte qui garantit que la propriété id est unique pour les nœuds de type Usager
+CREATE CONSTRAINT IF NOT EXISTS FOR (u:Usager) REQUIRE u.id IS UNIQUE; 
+
+// créer une contrainte qui garantit que la propriété id_vehicule est unique pour les nœuds de type Vehicules
+CREATE CONSTRAINT IF NOT EXISTS FOR (v:Vehicules) REQUIRE v.id_vehicule IS UNIQUE;
+
 // Chargement des données depuis un fichier CSV "caracteristiques.csv"
-LOAD CSV WITH HEADERS FROM 'https://github.com/Xoogsede/Accidents_routes_fr/blob/main/data/caracteristiques.csv?raw=true' AS line FIELDTERMINATOR ";"
+:auto :auto LOAD CSV WITH HEADERS FROM 'https://github.com/Xoogsede/Accidents_routes_fr/blob/main/data/caracteristiques.csv?raw=true' AS row FIELDTERMINATOR ";"
 CALL {
-WITH line 
-WITH line AS line
-WHERE line.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
-CREATE (a:Accident { 
-    Num_Acc : toInteger(line.Num_Acc),
-    Jour : toInteger(line.jour),
-    Mois : toInteger(line.mois),
-    An : toInteger(line.an),
-    Heure : toInteger(line.hrmn),
-    Lumière : toInteger(line.lum),
-    Département : toInteger(CASE WHEN line.dep='2A' or line.dep='2B' THEN '20'   
-                      ELSE CASE WHEN SIZE(line.dep)=1 THEN ("0"+line.dep) 
-                                else line.dep END
+WITH row 
+WITH row AS row
+WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
+MATCH (ac:Accident {Num_Acc:row.Num_Acc})
+WHERE ac.Num_Acc<>row.Num_Acc 
+CREATE (a:Accident { Num_Acc : toInteger(row.Num_Acc),
+    Jour : toInteger(row.jour),
+    Mois : toInteger(row.mois),
+    An : toInteger(row.an),
+    Heure : toInteger(row.hrmn),
+    Lumière : toInteger(row.lum),
+    Département : toInteger(CASE WHEN row.dep='2A' or row.dep='2B' THEN '20'   
+                      ELSE CASE WHEN SIZE(row.dep)=1 THEN ("0"+row.dep) 
+                                else row.dep END
                   END),
-    Commune : toInteger(line.com),
-    Localisation : toInteger(line.agg),
-    Intersection : toInteger(line.int),
-    Conditions_atmosphériques : toInteger(line.atm),
-    Type_de_collision : toInteger(line.col),
-    Adresse_postale : line.adr,
-    Latitude : toFloat(line.lat),
-    Longitude : toFloat(line.long)
- })} IN TRANSACTIONS OF 500 ROWS
+    Commune : toInteger(row.com),
+    Localisation : toInteger(row.agg),
+    Intersection : toInteger(row.int),
+    Conditions_atmosphériques : toInteger(row.atm),
+    Type_de_collision : toInteger(row.col),
+    Adresse_postale : row.adr,
+    Latitude : toFloat(row.lat),
+    Longitude : toFloat(row.long)
+})
+ } IN TRANSACTIONS OF 500 ROWS
  RETURN COUNT(*) ;// retourne le nombre de nœuds créés
 
 //Conversion de la latitude et de la longitude en réel (au chargement c'est en chaine de caractère)
@@ -37,21 +51,20 @@ MATCH (a:Accident)
 SET a.Latitude = toFloat(a.Latitude), a.Longitude = toFloat(a.Longitude);
 
 
-// créer une contrainte qui garantit que la propriété Num_Acc est unique pour les nœuds de type Accident
-CREATE CONSTRAINT FOR (a:Accident) REQUIRE a.Num_Acc IS UNIQUE; 
-
 
 // création d'index sur les propriété Latitude et Longitude pour améliorer les performances de certaines requêtes.
-CREATE INDEX FOR (a:Accident) ON (a.Latitude);
-CREATE INDEX FOR (a:Accident) ON (a.Longitude);
+CREATE INDEX IF NOT EXISTS FOR (a:Accident) ON (a.Latitude);
+CREATE INDEX IF NOT EXISTS FOR (a:Accident) ON (a.Longitude);
 
 
 // Chargement des données depuis un fichier CSV "lieux.csv"
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/lieux.csv" AS row FIELDTERMINATOR ";"
+:auto :auto LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/lieux.csv" AS row FIELDTERMINATOR ";"
 CALL {
 WITH row 
 WITH row AS row
 WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
+MATCH (l:Lieux {Num_Acc:row.Num_Acc})
+WHERE l.Num_Acc<>row.Num_Acc 
 CREATE (li:Lieux {
 Num_Acc: row.Num_Acc,
 Categorie: row.catr,
@@ -79,14 +92,13 @@ SET li.Num_Acc = toInteger(li.Num_Acc)
 
 //Conversion de la latitude et de la longitude en réel (au chargement c'est en chaine de caractère)
 MATCH (li:Lieux)
+WITH li AS li
 SET li.lartpc = toFloat(li.lartpc), li.larrout = toFloat(li.larrout), li.pr1 = toFloat(li.pr1);
 
-// créer une contrainte qui garantit que la propriété Num_Acc est unique pour les nœuds de type Lieux
-CREATE CONSTRAINT FOR (li:Lieux) REQUIRE li.Num_Acc IS UNIQUE; 
 
 
 // Chargement des données depuis un fichier CSV "usagers.csv"
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/usagers.csv" AS row FIELDTERMINATOR ";"
+:auto LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/usagers.csv" AS row FIELDTERMINATOR ";"
 CALL {
 WITH row 
 WITH row AS row
@@ -112,11 +124,10 @@ RETURN count(*); // retourne le nombre de nœuds créés
 
 MATCH (u:Usager)
 SET u.Num_Acc = toInteger(u.Num_Acc)
-// créer une contrainte qui garantit que la propriété id est unique pour les nœuds de type Usager
-CREATE CONSTRAINT FOR (u:Usager) REQUIRE u.id IS UNIQUE; 
+
 
 // Chargement des données depuis un fichier CSV "vehicules.csv"
-LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/vehicules.csv" AS row FIELDTERMINATOR ";"
+:auto LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/vehicules.csv" AS row FIELDTERMINATOR ";"
 CALL {
 WITH row 
 WITH row AS row
@@ -143,8 +154,6 @@ SET v.Num_Acc = toInteger(v.Num_Acc)
 MATCH (v:Vehicules)
 SET v.occutc = toFloat(v.occutc);
 
-// créer une contrainte qui garantit que la propriété id_vehicule est unique pour les nœuds de type Vehicules
-CREATE CONSTRAINT FOR (v:Vehicules) REQUIRE v.id_vehicule IS UNIQUE;
 
 
 // Création de relations entre les nœuds de type "Usager" et "Vehicules" en utilisant la propriété commune "Num_Acc"
