@@ -33,11 +33,9 @@ neo4j_password  = os.environ.get('neo4j_password')
 try:
     URI = neo4j_uri
     AUTH = (neo4j_user, neo4j_password)
-    print(URI, AUTH)
 except:
     URI = st.secrets['neo4j_uri']
-    AUTH = (st.secrets['neo4j_user'], st.secrets['neo4j_password'])
-    print(URI, AUTH)    
+    AUTH = (st.secrets['neo4j_user'], st.secrets['neo4j_password']) 
 else:
     print('Connexion avec secrets streamlit')
 
