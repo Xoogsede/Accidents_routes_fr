@@ -76,7 +76,7 @@ def main():
         """
         
         results  = graph.run(query).to_data_frame()
-        st.write(results)
+        # st.write(results)
 
         # convertir les résultats en DataFrame et concaténation
         try:
