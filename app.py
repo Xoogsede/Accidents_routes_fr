@@ -30,25 +30,24 @@ neo4j_uri       = os.environ.get('neo4j_uri')
 neo4j_user      = os.environ.get('neo4j_user')
 neo4j_password  = os.environ.get('neo4j_password')
 
+uri_st = st.secrets['neo4j_uri']
+us_st = st.secrets['neo4j_user']
+pass_st = st.secrets['neo4j_password']
+
 try:
     URI = neo4j_uri
     AUTH = (neo4j_user, neo4j_password)
 except:
-    URI = st.secrets['neo4j_uri']
-    AUTH = (st.secrets['neo4j_user'], st.secrets['neo4j_password']) 
-else:
+    URI = uri_st
+    AUTH = (us_st, pass_st)     
     print('Connexion avec secrets streamlit')
-
-
-
-# with GraphDatabase.driver(URI, auth=AUTH) as driver:
-#     driver.verify_connectivity()
+    
 
 def main():
     
 
     # Connexion à la base de données Neo4j
-    graph = Graph(URI, auth=AUTH, routing = True)
+    graph = Graph(URI, auth=AUTH, name="accidentdelaroute")
 
     st.title("Recherche d'accidents de la route")
     st.sidebar.title("Paramètres de recherche")
@@ -60,7 +59,7 @@ def main():
 
     # Saisie du rayon de recherche
     radius = st.sidebar.number_input("Rayon de recherche (en mètres)", min_value=0, max_value=1000000, value=1000)
-
+   
     if st.button("Rechercher") and address!="":
         # Convertir l'adresse en coordonnées
         latitude, longitude = geocode_address(address)
@@ -77,6 +76,7 @@ def main():
         """
         
         results  = graph.run(query).to_data_frame()
+        st.write(results)
 
         # convertir les résultats en DataFrame et concaténation
         try:
@@ -102,7 +102,7 @@ def main():
             df = df.drop_duplicates()
             # df['occutc'] = df.occutc.fillna(-1)
 
-            df['Date'] = df['An'] + '-' + df['Mois'] + '-' + df['Jour'] + ' ' + df['Heure']
+            df['Date'] = df['An'].astype('str') + '-' + df['Mois'].astype('str') + '-' + df['Jour'].astype('str') + ' ' + df['Heure']
             df['Date'] = pd.to_datetime(df['Date'])            
             
             df["Adresse_postale"] = df.Adresse_postale.str.replace("  ", "")

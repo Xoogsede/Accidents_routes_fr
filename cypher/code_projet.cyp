@@ -4,6 +4,14 @@
 //dbms.memory.transaction.total.max=104857600000m
 //db.memory.transaction.max=160000000m
 
+:use system;
+
+DROP DATABASE IF EXISTS accidentdelaroute;
+
+CREATE DATABASE accidentdelaroute;
+
+:use accidentdelaroute;
+
 // créer une contrainte qui garantit que la propriété Num_Acc est unique pour les nœuds de type Accident
 CREATE CONSTRAINT IF NOT EXISTS FOR (a:Accident)  REQUIRE a.Num_Acc IS UNIQUE; 
 
@@ -22,35 +30,28 @@ CALL {
 WITH row 
 WITH row AS row
 WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
-MATCH (ac:Accident {Num_Acc:row.Num_Acc})
-WHERE ac.Num_Acc<> row.Num_Acc
-CREATE (a:Accident { Num_Acc : row.Num_Acc,
-    Jour : toInteger(row.jour),
-    Mois : toInteger(row.mois),
-    An : toInteger(row.an),
-    Heure : toInteger(row.hrmn),
-    Lumière : toInteger(row.lum),
-    Département : toInteger(CASE WHEN row.dep='2A' or row.dep='2B' THEN '20'   
+MERGE (a:Accident { Num_Acc : toInteger(row.Num_Acc)})
+SET   
+    a.Jour = toInteger(row.jour),
+    a.Mois = toInteger(row.mois),
+    a.An = toInteger(row.an),
+    a.Heure = row.hrmn,
+    a.Lumière = coalesce(toInteger(row.lum), -1),
+    a.Département = coalesce(toInteger(CASE WHEN row.dep='2A' or row.dep='2B' THEN '20'   
                       ELSE CASE WHEN SIZE(row.dep)=1 THEN ("0"+row.dep) 
                                 else row.dep END
-                  END),
-    Commune : toInteger(row.com),
-    Localisation : toInteger(row.agg),
-    Intersection : toInteger(row.int),
-    Conditions_atmosphériques : toInteger(row.atm),
-    Type_de_collision : toInteger(row.col),
-    Adresse_postale : row.adr,
-    Latitude : toFloat(row.lat),
-    Longitude : toFloat(row.long)
-})
+                  END), -1),
+    a.Commune = coalesce(toInteger(row.com), -1),
+    a.Localisation = coalesce(toInteger(row.agg),-1),
+    a.Intersection = coalesce(toInteger(row.int),-1),
+    a.Conditions_atmosphériques = coalesce(toInteger(row.atm), -1),
+    a.Type_de_collision = coalesce(toInteger(row.col),-1),
+    a.Adresse_postale = coalesce(row.adr, -1),
+    a.Latitude = coalesce(toFloat(replace(row.lat, ",", ".")), -1),
+    a.Longitude = coalesce(toFloat(replace(row.long, ",", ".")), -1)
+
  } IN TRANSACTIONS OF 500 ROWS
  RETURN COUNT(*) ;// retourne le nombre de nœuds créés
-
-//Conversion de la latitude et de la longitude en réel (au chargement c'est en chaine de caractère)
-MATCH (a:Accident)
-SET a.Latitude = toFloat(a.Latitude), a.Longitude = toFloat(a.Longitude);
-
-
 
 // création d'index sur les propriété Latitude et Longitude pour améliorer les performances de certaines requêtes.
 CREATE INDEX IF NOT EXISTS FOR (a:Accident) ON (a.Latitude);
@@ -63,36 +64,27 @@ CALL {
 WITH row 
 WITH row AS row
 WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
-MATCH (l:Lieux {Num_Acc:row.Num_Acc})
-WHERE l.Num_Acc<>row.Num_Acc
-CREATE (li:Lieux { Num_Acc: row.Num_Acc,
-Categorie: row.catr,
-voie: row.voie,
-v1: row.v1,
-v2: row.v2,
-circ: row.circ,
-nbv: row.nbv,
-vosp: row.vosp,
-prof: row.prof,
-pr: row.pr,
-pr1: row.pr1,
-plan: row.plan,
-lartpc: row.lartpc,
-larrout: row.larrout,
-surf: row.surf,
-infra: row.infra,
-situ: row.situ,
-vma: row.vma
-})} IN TRANSACTIONS OF 500 ROWS
+MERGE (li:Lieux {Num_Acc: coalesce(toInteger(row.Num_Acc), -1)})
+SET 
+li.Categorie= row.catr,
+li.voie= row.voie,
+li.v1= row.v1,
+li.v2= row.v2,
+li.circ= row.circ,
+li.nbv= row.nbv,
+li.vosp= row.vosp,
+li.prof= row.prof,
+li.pr= row.pr,
+li.pr1=  coalesce(toFloat(replace(li.pr1, ",", ".")), -1),
+li.plan= row.plan,
+li.lartpc=  coalesce(toFloat(replace(li.lartpc, ",", ".")), -1),
+li.larrout=  coalesce(toFloat(replace(li.larrout, ",", ".")), -1),
+li.surf= row.surf,
+li.infra= row.infra,
+li.situ= row.situ,
+li.vma= row.vma
+} IN TRANSACTIONS OF 500 ROWS
 RETURN count(*) ; // retourne le nombre de nœuds créés
-
-
-//Conversion de la latitude et de la longitude en réel (au chargement c'est en chaine de caractère)
-MATCH (li:Lieux)
-WITH li AS li
-SET li.lartpc = toFloat(li.lartpc), li.larrout = toFloat(li.larrout), li.pr1 = toFloat(li.pr1);
-
-
 
 // Chargement des données depuis un fichier CSV "usagers.csv"
 :auto LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/usagers.csv" AS row FIELDTERMINATOR ";"
@@ -100,30 +92,25 @@ CALL {
 WITH row 
 WITH row AS row
 WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
-MATCH (us:Usager {id:row.id})
-WHERE us.id<>row.id 
-CREATE (u:Usager {
-Num_Acc: row.Num_Acc,
-id_vehicule: row.id_vehicule,
-num_veh: row.num_veh,
-place: row.place,
-catu: row.catu,
-grav: row.grav,
-sexe: row.sexe,
-an_nais: row.an_nais,
-trajet: row.trajet,
-secu1: row.secu1,
-secu2: row.secu2,
-secu3: row.secu3,
-locp: row.locp,
-actp: row.actp,
-etatp: row.etatp,
-id: row.id
-})} IN TRANSACTIONS OF 500 ROWS
+MERGE (u:Usager { id : toInteger(row.id)})
+SET
+  u.Num_Acc= coalesce(toInteger(row.Num_Acc), -1),
+  u.id_vehicule= row.id_vehicule,
+  u.num_veh= row.num_veh,
+  u.place= row.place,
+  u.catu= row.catu,
+  u.grav= row.grav,
+  u.sexe= row.sexe,
+  u.an_nais= row.an_nais,
+  u.trajet= row.trajet,
+  u.secu1= row.secu1,
+  u.secu2= row.secu2,
+  u.secu3= row.secu3,
+  u.locp= row.locp,
+  u.actp= row.actp,
+  u.etatp= row.etatp
+} IN TRANSACTIONS OF 500 ROWS
 RETURN count(*); // retourne le nombre de nœuds créés
-
-
-
 
 // Chargement des données depuis un fichier CSV "vehicules.csv"
 :auto LOAD CSV WITH HEADERS FROM "https://raw.githubusercontent.com/Xoogsede/Accidents_routes_fr/main/data/vehicules.csv" AS row FIELDTERMINATOR ";"
@@ -131,53 +118,49 @@ CALL {
 WITH row 
 WITH row AS row
 WHERE row.Num_Acc IS NOT NULL // filtrer les lignes qui ont une valeur non nulle pour la propriété Num_Acc
-MATCH (ve:Vehicules {id_vehicule:row.id_vehicule})
-WHERE ve.id_vehicule<>row.id_vehicule 
-CREATE (v:Vehicules {
-Num_Acc: row.Num_Acc, 
-id_vehicule: row.id_vehicule, 
-num_veh: row.num_veh, 
-senc: row.senc, 
-catv: row.catv, 
-obs: row.obs, 
-obsm: row.obsm, 
-choc: row.choc, 
-manv: row.manv, 
-motor: row.motor, 
-occutc: row.occutc
-})} IN TRANSACTIONS OF 500 ROWS
+MERGE (v:Vehicules {id_vehicule:row.id_vehicule})
+SET
+v.Num_Acc= coalesce(toInteger(row.Num_Acc), -1), 
+v.num_veh= row.num_veh, 
+v.senc= row.senc, 
+v.catv= row.catv, 
+v.obs= row.obs, 
+v.obsm= row.obsm, 
+v.choc= row.choc, 
+v.manv= row.manv, 
+v.motor= row.motor, 
+v.occutc= coalesce(toFloat(replace(v.occutc, ",", ".")), -1)
+} IN TRANSACTIONS OF 500 ROWS
 RETURN count(*) ;// retourne le nombre de nœuds créés
 
 
-MATCH (v:Vehicules)
-WITH v AS v
-SET v.occutc = toFloat(v.occutc);
-
-
-
 // Création de relations entre les nœuds de type "Usager" et "Vehicules" en utilisant la propriété commune "Num_Acc"
+:auto CALL {
 MATCH (u:Usager), (v:Vehicules)
 WHERE u.Num_Acc = v.Num_Acc
-  MERGE (u)-[:EST_PRESENT]->(v);
+  MERGE (u)-[:EST_PRESENT]->(v)} IN TRANSACTIONS OF 500 ROWS;
 
 
 // Création de relations entre les nœuds de type "Usager" et "Accident" en utilisant la propriété commune "Num_Acc"
+:auto CALL {
 MATCH (u:Usager), (a:Accident)
 WHERE u.Num_Acc = a.Num_Acc
-  MERGE (u)-[:EST_CONCERNE]->(a);
+  MERGE (u)-[:EST_CONCERNE]->(a)} IN TRANSACTIONS OF 500 ROWS;
 
 
 
 // Création de relations entre les nœuds de type "Accident" et "Vehicules" en utilisant la propriété commune "Num_Acc"
-MATCH (a:Accident), (v:Vehicules)
+:auto CALL {
+  MATCH (a:Accident), (v:Vehicules)
 WHERE a.Num_Acc = v.Num_Acc
-  MERGE (a)-[:IMPLIQUE]->(v);
+  MERGE (a)-[:IMPLIQUE]->(v)} IN TRANSACTIONS OF 500 ROWS;
 
 
 // Création de relations entre les nœuds de type "Accident" et "Lieux" en utilisant la propriété commune "Num_Acc"
-MATCH (a:Accident), (l:Lieux)
+:auto CALL {
+  MATCH (a:Accident), (l:Lieux)
 WHERE a.Num_Acc = l.Num_Acc
-  MERGE (a)-[:EST_LOCALISE]->(l);
+  MERGE (a)-[:EST_LOCALISE]->(l)} IN TRANSACTIONS OF 500 ROWS;
 
 
 // Recherche des relations multiples 
