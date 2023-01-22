@@ -6,7 +6,7 @@
 
 :use system;
 
-DROP DATABASE IF EXISTS accidentdelaroute;
+DROP DATABASE accidentdelaroute IF EXISTS ;
 
 CREATE DATABASE accidentdelaroute;
 
