@@ -26,13 +26,16 @@ def geocode_address(address):
 
 
 # Création de Neo4jRepository object
-neo4j_uri  = st.secrets['neo4j_uri']
-neo4j_user = st.secrets['neo4j_user']
-neo4j_password  = st.secrets['neo4j_password']
+neo4j_uri       = os.environ.get('neo4j_uri')
+neo4j_user      = os.environ.get('neo4j_user')
+neo4j_password  = os.environ.get('neo4j_password')
 
-
-URI = neo4j_uri
-AUTH = (neo4j_user, neo4j_password)
+try:
+    URI = st.secrets['neo4j_uri']
+    AUTH = (st.secrets['neo4j_user'], st.secrets['neo4j_password'])
+except:
+    URI = neo4j_uri
+    AUTH = (neo4j_user, neo4j_password)
     
 
 def main():
