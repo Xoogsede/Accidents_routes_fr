@@ -162,6 +162,8 @@ WHERE a.Num_Acc = v.Num_Acc
 WHERE a.Num_Acc = l.Num_Acc
   MERGE (a)-[:EST_LOCALISE]->(l)} IN TRANSACTIONS OF 500 ROWS;
 
+// Vue d'ensemble des relations
+CALL db.schema.visualization();
 
 // Recherche des relations multiples 
 MATCH (a)-[r]->(b) WITH a, b, COUNT(r) AS c WHERE c>1 RETURN a, b, c
@@ -174,8 +176,7 @@ WITH a, b, collect(r)[1..] as rels
 UNWIND rels as r
 DELETE r
 
-// Vue d'ensemble des relations
-CALL db.schema.visualization();
+
 
 
 // Accident ayant impliqué le plus de véhicules et de victimes

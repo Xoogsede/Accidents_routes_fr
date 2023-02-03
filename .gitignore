@@ -7,7 +7,7 @@
 .brouillon.py
 .brouillon.py
 carte.html
-.streamlit/*
+
 
 
 carte.html
@@ -25,7 +25,6 @@ brouillon/
 optimisation/
 organisation_app/
 donnees_CSV/
-Dockerfile
 package-lock.json
 package.json
 modelisation.ipynb
