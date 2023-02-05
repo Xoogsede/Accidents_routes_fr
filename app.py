@@ -2,27 +2,16 @@ import streamlit as st
 from py2neo import Graph
 from geopy.geocoders import Nominatim
 import folium
-# from pyvis.network import Network
 from streamlit_folium import folium_static 
 import pandas as pd
 import matplotlib.pyplot as plt
+import dict_correspondance
 from  dict_correspondance import *
 import seaborn as sns
 import os
 
 
 
-# Fonction pour convertir une adresse en coordonnées latitude/longitude
-
-def geocode_address(address):
-    geolocator = Nominatim(user_agent="geoapiExercises")
-    try:
-        location = geolocator.geocode(address)
-        print(location.address)
-        return location.latitude, location.longitude
-    except:
-        print("Erreur dans l'adresse")
-    
 
 
 # Création de Neo4jRepository object
@@ -38,158 +27,107 @@ except:
     AUTH = (neo4j_user, neo4j_password)
     
 
-def main():
-    
+# Connexion à la base de données Neo4j
+graph = Graph(URI, auth=AUTH)
 
-    # Connexion à la base de données Neo4j
-    graph = Graph(URI, auth=AUTH)
+st.write("# Bienvenue sue l'application de suivi des accidents de la route en France 👋")
+# st.sidebar.success("Navigez pour voir le contenu")
 
-    st.title("Recherche d'accidents de la route")
-    st.sidebar.title("Paramètres de recherche")
+st.markdown('''Nos données proviennent du fichier national des accidents corporels de la circulation administré par \
+    l’Observatoire National Interministériel de la Sécurité Routière disponibles sur le site data.gouv.fr . \
+        Il s’agit de données ouvertes répertoriant l’intégralité des accidents corporels survenus durant \
+            une année précise en France Métropolitaine, dans les DOM et TOM. On y retrouve 4 fichiers différents : 
 
-    # Saisie de l'adresse postale
-    address = st.sidebar.text_input("Adresse postale", "", key="Adresse")
-    dt_deb = st.sidebar.date_input("date de début",  label_visibility='visible', key="deb", value=pd.to_datetime("2018-12-31"))
-    dt_fin = st.sidebar.date_input(label="date de fin", label_visibility='visible', key="fin")
+Informations de localisation de l’accident,  
 
-    # Saisie du rayon de recherche
-    radius = st.sidebar.number_input("Rayon de recherche (en mètres)", min_value=0, max_value=1000000, value=1000)
-   
-    if st.button("Rechercher") and address!="":
-        # Convertir l'adresse en coordonnées
-        latitude, longitude = geocode_address(address)
-        print(latitude, longitude)
-        # Exécuter la requête Neo4j pour trouver les accidents dans un rayon autour de l'adresse
-        query = f"""        
-        WITH point({{latitude: {latitude}, longitude: {longitude}}}) AS pac
-        MATCH (a:Accident), (u:Usager), (v:Vehicules)
-        WHERE a.Latitude IS NOT NULL AND a.Longitude IS NOT NULL AND a.Num_Acc = u.Num_Acc AND a.Num_Acc = v.Num_Acc
-        WITH a, point.distance(point({{latitude: toFloat(a.Latitude), longitude: toFloat(a.Longitude)}}), pac) AS distance, u, v
-        WHERE distance < {radius}
-        RETURN a, u, v, distance
-        ORDER BY distance ;
-        """
-        
-        results  = graph.run(query).to_data_frame()
-        # st.write(results)
+Informations concernant les caractéristiques de l’accident,  
 
-        # convertir les résultats en DataFrame et concaténation
+Informations sur les victimes 
+
+Les véhicules impliqués.  
+
+
+
+Compte tenu de certains indicateurs mis à jour à partir de 2019, il est préconisé de ne pas comparer les données à \
+    partir de 2019 avec celles des années précédentes. Ceci explique notre horizon temporel (2019-2021).  
+
+Ces jeux de données sont riches et très intéressants car ils brassent depuis plus de 15 ans un nombre important de\
+     variables de tous genres. Ils sont mis à jour annuellement et sont d’un intérêt général.  
+ 
+ L'exploitation des données est faite avec Neo4j, un système de gestion de base de données au code source libre basé \
+    sur les graphes, développé en Java par la société Neo technology. Le produit existe depuis 2000, la version 1.0 \
+        est sortie en février 2010 (source wikipedia)
+ ''')
+
+
+st.write(''' ## Accident ayant impliqué le plus de véhicules et de victimes  ''')
+
+# Convertir l'adresse en coordonnées
+# latitude, longitude = geocode_address(address)
+# print(latitude, longitude)
+# Exécuter la requête Neo4j pour trouver les accidents dans un rayon autour de l'adresse
+query = f"""        
+MATCH (n)
+RETURN n, size([(n)-[r]->() | r]) as degree
+ORDER BY degree DESC
+LIMIT 1;
+"""
+
+results  = graph.run(query).to_data_frame()
+df  = pd.DataFrame.from_records(results['n'])
+
+
+
+# Afficher les résultats de la requête sous forme de graphe Neo4j
+st.subheader("Résultats de la requête")
+
+
+
+
+# Transformer les données : 
+
+df['Date'] = df['An'].astype('str') + '-' + df['Mois'].astype('str') + '-' + df['Jour'].astype('str') + ' ' + df['Heure']
+df.insert(0, 'Date', df.pop('Date'), allow_duplicates=False)
+df['Date'] = pd.to_datetime(df['Date']) 
+df.drop(columns=['An', 'Mois', 'Jour', 'Heure'], inplace=True)       
+
+# for titre in df.columns:
+#     try:
+#         df[str(titre)] = df[str(titre)].astype('int')
+#     except:
+#         st.write(titre, 'not converted')
+#         continue
+
+
+dc = dict_correspondance.__dict__ 
+# st.write(d)
+
+# Récupération des correspondances
+def trouv_corresp(df):
+    for titre in df.columns:
         try:
-            acc = pd.DataFrame.from_records(results["a"])
-            usg = pd.DataFrame.from_records(results["u"])
-            vhc = pd.DataFrame.from_records(results["v"])
-            df = acc.merge(usg.merge(vhc, how='right', on='Num_Acc', suffixes=('_left', '_right')), how='right', on='Num_Acc', suffixes=('_left', '_right'))
+            df[titre] = df[titre].astype('int')
         except:
-            df = pd.DataFrame()   
-        
+            continue
 
-        # Afficher les résultats de la requête sous forme de graphe Neo4j
-        st.subheader("Résultats de la requête")
-        if results.shape[0] > 0 :
-            
-            # Récupération des correspondances
-            type_meteo = dic_convert(Conditions_atm)
-            typologie = dic_convert(Type_de_collision)     
+    for col in df.columns:
+        try:
+            ref = dc[col]
+            ref = dic_convert(ref)            
+            for k,v in ref.items():
+                print("cle : ", k,", val : ", v, "col :", col )
+                df[col].replace(v, k.replace('_', " "), inplace=True)
+        except :
+            continue 
+    return df
+df1 = trouv_corresp(df)
 
-            # Transformer les données : 
-            
-            df = df.loc[:, ~df.columns.duplicated()]
-            df = df.drop_duplicates()
-            # df['occutc'] = df.occutc.fillna(-1)
-
-            df['Date'] = df['An'].astype('str') + '-' + df['Mois'].astype('str') + '-' + df['Jour'].astype('str') + ' ' + df['Heure']
-            df['Date'] = pd.to_datetime(df['Date'])            
-            
-            df["Adresse_postale"] = df.Adresse_postale.str.replace("  ", "")
-            df["Type_de_collision"] = df.Type_de_collision.astype('int')
-            df["Conditions_atmosphériques"] = df["Conditions_atmosphériques"].astype('int')
-
-            for k,v in typologie.items():
-                df['Type_de_collision'].replace(v, k.replace('_', " "), inplace=True)
-            
-            for k,v in type_meteo.items():
-                df['Conditions_atmosphériques'].replace(v, k.replace('_', " "), inplace=True)
-            
-            st.write(df[["Date", "Adresse_postale", "Type_de_collision", "Conditions_atmosphériques"]])
-
-            # print(df[["Date", "Adresse_postale", "Type_de_collision", "Conditions_atmosphériques"]])
-            
-            
-            
-            st.dataframe(df[["Date", "Adresse_postale", "Type_de_collision", "sexe"]], use_container_width =True)
-            # vis_format = results[0]
-            # # créer un objet de réseau pyvis
-            # vis_network = Network(notebook=True)
-            # # ajouter les données
-            # vis_network.add_nodes(vis_format)
-            # # afficher le réseau
-            # vis_network.show('static/accident.html')
-
-            # st.graphviz_chart(figure_or_dot=results, use_container_width=True)
-            # st.write("Résultats sur un graphe Neo4j:")
-            # st.write(open('static/accident.html').read(), unsafe_allow_html=True)
+st.write(df1)
 
 
-            st.title("Localisation géographique")
-            # Afficher les résultats sur une carte
-            st.subheader("Résultats sur une carte")
-            # Création de la carte
-            map = folium.Map(location=[latitude, longitude], zoom_start=13)
-            folium.Marker([latitude, longitude], popup=address, tooltip="<strong>"f'{address}'"</strong>", 
-                        icon=folium.Icon(color='red')).add_to(map)
-            # Ajouter les marqueurs pour les accidents
-            for _ , accident in acc[['Latitude', 'Longitude']].iterrows():
-                lat = accident['Latitude']
-                lon = accident['Longitude']
-                folium.Marker([lat, lon]).add_to(map)
-
-            map.save("static/carte.html")
-            folium_static(map)            
-
-
-            st.title("Statistique")
-            st.subheader("Typologie d'accident")  
-            st.write("Total accidents", df[["Type_de_collision"]].count().tolist()[0])
-
-            
-            
-
-            fig = plt.figure(figsize = (10, 5))
-            
-
-            ax = sns.countplot(x = 'Type_de_collision', data = df)
-            ax.set_xticklabels(ax.get_xticklabels(), rotation = 90)
-            ax.set_title("Catégorie d'accident")
-            ax.set_xlabel("Type d'accident")
-            ax.set_ylabel("Nombre d'accident")
-
-            st.pyplot(fig)
-            
-
-
-            # Conditions atmosphérique
-            st.write("Conditions météo lors des accidents")
-
-            
-            
-            
-
-        
-            fig = plt.figure(figsize = (10, 5))                     
-            
-            ax = sns.countplot(x = 'Conditions_atmosphériques', data = df)
-            ax.set_title("Conditions atmosphériques")
-            ax.set_xlabel("Conditions météo")
-            ax.set_ylabel("Nombre d'accident")
-            st.pyplot(fig)
+# df["Adresse_postale"] = df.Adresse_postale.str.replace("  ", "")
 
 
 
 
 
-
-    if st.button("Réinitialiser"):
-        st.empty()
-
-if __name__ == "__main__":
-    main()

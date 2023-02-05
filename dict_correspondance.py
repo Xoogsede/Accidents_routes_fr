@@ -1,4 +1,4 @@
-Lumiere = {
+Lumière = {
 	"Plein_jour":1,
 	"Crepuscule_ou_aube":2,
 	"Nuit_sans_eclairage_public":3,
@@ -21,7 +21,7 @@ Intersection = {
 	"Passage_a_niveau":8,
 	"Autre_intersection":9}
 
-Conditions_atm = {
+Conditions_atmosphériques = {
     "Non_renseigne":-1,
 	"Normale":1,
 	"Pluie_legere":2,
@@ -135,14 +135,14 @@ Categorie_du_vehicule = {
 	0: 'Indéterminable',
 	1: 'Bicyclette',
 	2: 'Cyclomoteur <50cm3',
-	3: 'Voiturette (Quadricycle à moteur carrossé) (anciennement "voiturette ou tricycle à moteur")',
+	3: 'Voiturette (Quadricycle à moteur carrossé)',
 	4: 'Référence inutilisée depuis 2006 (scooter immatriculé)',
 	5: 'Référence inutilisée depuis 2006 (motocyclette)',
 	6: 'Référence inutilisée depuis 2006 (side-car)',
 	7: 'VL seul',
 	8: 'Référence inutilisée depuis 2006 (VL + caravane)',
 	9: 'Référence inutilisée depuis 2006 (VL + remorque)',
-	10: 'VU seul 1,5T <= PTAC <= 3,5T avec ou sans remorque (anciennement VU seul 1,5T <= PTAC <= 3,5T)',
+	10: 'VU seul 1,5T <= PTAC <= 3,5T avec ou sans remorque',
 	11: 'Référence inutilisée depuis 2006 (VU (10) + caravane)',
 	12: 'Référence inutilisée depuis 2006 (VU (10) + remorque)',
 	13: 'PL seul 3,5T <PTCA <= 7,5T',
@@ -260,7 +260,7 @@ Type_motorisation_vehicule = {
 #usager
 
 Categorie_usager = {
-	-1: 'Non renseigné',
+	'Non renseigné':-1,
 	'Conducteur':1,
 	'Passager':2,
 	'Piéton':3}
@@ -361,9 +361,9 @@ Etat_pieton = {
 # funcion qui permet de s'assurer que les clés des dictionnaire sont bien les integer
 # utilisé dans le tableau 
 def dic_convert(dictionnaire):
-	for k, v in dictionnaire.items():				
-		new_dict = {}
-		if (type(k) == 'int' or len(str(k)) == 1):
+	new_dict = {}
+	for k, v in dictionnaire.items():					
+		if (len(str(k)) < len(str(v))):
 			new_dict[v]=k			
 		else:
 			new_dict = dictionnaire
