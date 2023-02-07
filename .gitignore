@@ -8,10 +8,6 @@
 .brouillon.py
 .streamlit/*
 
-
-carte.html
-
-
 ### Flask app ###
 instance/*
 !instance/.gitignore
