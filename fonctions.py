@@ -1,6 +1,6 @@
 import streamlit as st
-import dict_correspondance as dc
-from Accueil import graph
+# import dict_correspondance as dc
+# import Accueil as ac
 import pandas as pd
 
 import locale
@@ -21,9 +21,12 @@ def dic_convert(dictionnaire):
 	
 	return new_dict
 
-dc_list = dc.__dict__
+
+
 # Récupération des correspondances
-def trouv_corresp(df, dictionnaire=dc):
+
+
+def trouv_corresp(df, dictionnaire, dc_list):
     '''
     Converti les codes en claire dans un tableau
     Elle prend en entré un dataframe et le dictionnaire des correspondances '''
@@ -52,7 +55,7 @@ def trouv_corresp(df, dictionnaire=dc):
 
 
 # from Accueil import graph
-def data(query):
+def data(graph, query):
     results_query  = graph.run(query).to_data_frame()
     
     df  = pd.DataFrame.from_records(results_query.iloc[:,0])
@@ -66,7 +69,6 @@ def data(query):
 
         df = trouv_corresp(df)
         df['Date'] = pd.to_datetime(df['Date'])
-        st.write('Format de la date :', df.Date[0])
         df.fillna(-1, inplace=True)
         acci_num = df.Num_Acc[0]
     except:
@@ -78,24 +80,23 @@ def data(query):
     return (df, acci_num)
 
 
-
-def data_query_transform(query, dictionnaire=dc):
-    
-    df, acci_num = data(query)
-    df = trouv_corresp(df, dc)
-
+def data_query_transform(graph, query, dictionnaire):
+    dc_list = dictionnaire.__dict__
+    df, acci_num = data(graph, query)
+    df = trouv_corresp(df, dictionnaire, dc_list)
+    try:
+        df['Date'] = pd.to_datetime(df['Date'])
+    except:
+        pass
     return (df, acci_num)
 
 
-
-def total_implique(query):
+def total_implique(graph, query):
     
     df=graph.run(query).to_data_frame()
     implique = pd.DataFrame.from_records(df)
 
     return implique
-
-
 
 
 def _max_width_(prcnt_width:int = 75):

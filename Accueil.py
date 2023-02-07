@@ -6,11 +6,15 @@ from streamlit_folium import folium_static
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-# import dict_correspondance
-from  dict_correspondance import *
-
+import dict_correspondance as dc
+# from  dict_correspondance import *
+import time
 import os 
 
+
+import locale
+
+locale.setlocale(locale.LC_TIME, 'fr_FR')
 
 # Création de Neo4jRepository object
 neo4j_uri       = os.environ.get('neo4j_uri')
@@ -28,9 +32,9 @@ except:
 # Connexion à la base de données Neo4j
 graph = Graph(URI, auth=AUTH)
 
-
-from fonctions import data_query_transform as dqt, total_implique as tot
-
+# time.sleep(15)
+# from fonctions import fc.data_query_transform as fc.data_query_transform, total_implique as tot
+import  fonctions as fc
 
 st.set_page_config(
     page_title="Accitrack", 
@@ -41,6 +45,7 @@ st.set_page_config(
 if "df1" not in st.session_state:
     st.session_state["df1"]=""
 
+import queries as qr 
 
 
 st.write("# Bienvenue dans l'application de suivi des 🚘💥🚗 de la route en France 👋🏾")
@@ -80,8 +85,9 @@ st.write(''' ''')
 
 st.write(''' ### 1 - Accident ayant impliqué le plus de véhicules et de victimes :  ''')
 
-import queries as qr 
-df1, acci_num1 = dqt(qr.query)
+
+df1, acci_num1 = fc.data_query_transform(graph=graph, query=qr.query, dictionnaire=dc)
+
 
 st.session_state['df1'] = df1
 
@@ -92,11 +98,11 @@ st.session_state['df1'] = df1
 
 query1 = qr.query_stat(acci_num1)
 
-implique1 = tot(query1[0])
+implique1 = fc.total_implique(graph, query1[0])
 
-df11, _ = dqt(query1[1])
-df12, _ = dqt(query1[2])
-df13, _ = dqt(query1[3])
+df11, _ = fc.data_query_transform(graph=graph, query=query1[1], dictionnaire=dc)
+df12, _ = fc.data_query_transform(graph=graph, query=query1[2], dictionnaire=dc)
+df13, _ = fc.data_query_transform(graph=graph, query=query1[3], dictionnaire=dc)
 
 vhl2 = df13['catv'].value_counts().reset_index()
 
@@ -115,15 +121,15 @@ https://www.le-pays.fr/saint-just-saint-rambert-42170/faits-divers/une-quinzaine
 
 
 
-df2, acci_num2 = dqt(qr.query5)
+df2, acci_num2 = fc.data_query_transform(graph=graph, query=qr.query5, dictionnaire=dc)
 
 query2 = qr.query_stat(acci_num2)
 
-implique2 = tot(query2[0])
+implique2 = fc.total_implique(graph, query2[0])
 
-df21, _ = dqt(query2[1])
-df22, _ = dqt(query2[2])
-df23, _ = dqt(query2[3])
+df21, _ = fc.data_query_transform(graph=graph, query=query2[1], dictionnaire=dc)
+df22, _ = fc.data_query_transform(graph=graph, query=query2[2], dictionnaire=dc)
+df23, _ = fc.data_query_transform(graph=graph, query=query2[3], dictionnaire=dc)
 
 vhl2 = df23['catv'].value_counts().reset_index()
 
