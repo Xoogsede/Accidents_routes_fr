@@ -8,3 +8,4 @@ seaborn==0.12.2
 streamlit==1.17.0
 streamlit_folium==0.10.0
 protobuf==3.20.1
+Babel==2.11.0
