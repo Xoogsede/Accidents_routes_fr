@@ -1,4 +1,18 @@
-from app import *
+from Accueil import *
+from fonctions import _max_width_
+
+
+
+# Fonction pour convertir une adresse en coordonnées latitude/longitude
+def geocode_address(address):
+    geolocator = Nominatim(user_agent="geoapiExercises")
+    try:
+        location = geolocator.geocode(address)
+        print(location.address)
+        return location.latitude, location.longitude
+    except Exception:
+        st.markdown(''' ## <font color='red'>🚨🚨 ERREUR DANS L'ADRESSE 🚨🚨</font>''', unsafe_allow_html=True)
+        pass
 
 
 def recherche():
@@ -8,7 +22,12 @@ def recherche():
     graph = Graph(URI, auth=AUTH)
 
     st.title("Recherche d'accidents de la route")
-    st.title("Paramètres de recherche")
+    st.write('''
+    ##### Entrez une adresse ou simplement un code postal pour voir les accidents \
+    dans une zone.
+    ##### Utilisez les dates de début et de fin pour rechercher dans une période de temps.
+    ##### Utilisez le curseur pour définir un rayon de recherche. 
+        ''')
 
     # Saisie de l'adresse postale
     cp = st.text_input("Code postal", "", key="cp")
@@ -22,7 +41,14 @@ def recherche():
    
     if st.button("Rechercher") and address!="":
         # Convertir l'adresse en coordonnées
-        latitude, longitude = geocode_address(address)
+        try:
+            latitude, longitude = geocode_address(address)
+        except:
+            latitude, longitude  = (48.8582532, 2.294287)
+            st.markdown('''
+            ## <font color='green'>Adresse incorrect, latitude et longitude initialisées sur la 🗼</font>''', unsafe_allow_html=True)
+           
+            
         print(latitude, longitude)
         # Exécuter la requête Neo4j pour trouver les accidents dans un rayon autour de l'adresse
         query = f"""        
@@ -52,12 +78,8 @@ def recherche():
         st.subheader("Résultats de la requête")
         if results.shape[0] > 0 :
             
-            # Récupération des correspondances
-            type_meteo = dic_convert(Conditions_atmosphériques)
-            typologie = dic_convert(Type_de_collision)
-            sexe = dic_convert(Sexe_usager)     
-            cat_vh = dic_convert(Categorie_du_vehicule)
-            
+           
+
             # Transformer les données : 
             
             df = df.loc[:, ~df.columns.duplicated()]
@@ -65,51 +87,15 @@ def recherche():
             # df['occutc'] = df.occutc.fillna(-1)
 
             df['Date'] = df['An'].astype('str') + '-' + df['Mois'].astype('str') + '-' + df['Jour'].astype('str') + ' ' + df['Heure']
+            df.insert(0, 'Date', df.pop('Date'), allow_duplicates=False)
+
+            # Récupération des correspondances
+            df = trouv_corresp(df)
+
+
             df['Date'] = pd.to_datetime(df['Date'])            
-            
             df["Adresse_postale"] = df.Adresse_postale.str.replace("  ", "")
-            df["Type_de_collision"] = df.Type_de_collision.astype('int')
-            df["Conditions_atmosphériques"] = df["Conditions_atmosphériques"].astype('int')
-            df['sexe'] = df.sexe.astype('int')
-            df['catv'] = df['catv'].astype('int')
-
-            # Remplacement des codes par leur définitaion
-            for k,v in typologie.items():
-                df['Type_de_collision'].replace(v, k.replace('_', " "), inplace=True)
-            
-            for k,v in type_meteo.items():
-                df['Conditions_atmosphériques'].replace(v, k.replace('_', " "), inplace=True)
-            
-            for k,v in sexe.items():
-                df['sexe'].replace(v, k.replace('_', " "), inplace=True)
-            
-            for k,v in cat_vh.items():
-                df['catv'].replace(v, k.replace('_', " "), inplace=True)
-
-
-            # st.write(df['catv'])
-
-
-            # sns.countplot(x='Type_de_collision', hue='sexe', data=df)
-            # df[["Type_de_collision", "Conditions_atmosphériques"]].astype('category').value_counts()
-
-            # print(df[["Date", "Adresse_postale", "Type_de_collision", "Conditions_atmosphériques"]])
-            
-            
-            
-            # st.dataframe(df[["Type_de_collision", "sexe"]].astype('category').value_counts(), use_container_width =True)
-            # vis_format = results[0]
-            # # créer un objet de réseau pyvis
-            # vis_network = Network(notebook=True)
-            # # ajouter les données
-            # vis_network.add_nodes(vis_format)
-            # # afficher le réseau
-            # vis_network.show('static/accident.html')
-
-            # st.graphviz_chart(figure_or_dot=results, use_container_width=True)
-            # st.write("Résultats sur un graphe Neo4j:")
-            # st.write(open('static/accident.html').read(), unsafe_allow_html=True)
-
+           
 
 
             st.title("Statistique")
@@ -163,7 +149,7 @@ def recherche():
                 folium.Marker([accident['Latitude'], accident['Longitude']]).add_to(map)
 
             map.save("static/carte.html")
-            folium_static(map)            
+            folium_static(map, width=_max_width_(80))            
 
 
 

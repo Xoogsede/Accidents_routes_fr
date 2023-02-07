@@ -257,6 +257,10 @@ Type_motorisation_vehicule = {
 	5: 'Humaine',
 	6: 'Autre'}
 
+Nombre_d_occupants_dans_le_transport_en_commun = {
+	-1: 'Non renseigné'
+}
+
 #usager
 
 Categorie_usager = {
@@ -264,8 +268,9 @@ Categorie_usager = {
 	'Conducteur':1,
 	'Passager':2,
 	'Piéton':3}
+
 Gravite_blessure_usager = {
-	
+	-1: 'Non renseigné',
 	1: 'Indemne',
 	2: 'Tué',
 	3: 'Blessé hospitalisé',
@@ -358,14 +363,30 @@ Etat_pieton = {
 	3: 'En groupe'}
 
 
-# funcion qui permet de s'assurer que les clés des dictionnaire sont bien les integer
-# utilisé dans le tableau 
-def dic_convert(dictionnaire):
-	new_dict = {}
-	for k, v in dictionnaire.items():					
-		if (len(str(k)) < len(str(v))):
-			new_dict[v]=k			
-		else:
-			new_dict = dictionnaire
-	
-	return new_dict
+
+Vehicules = {
+	'senc': Sens_circulation,
+	'catv': Categorie_du_vehicule,
+	'obs': Obstacle_fixe_heurte,
+	'obsm': Obstacle_mobile_heurte,
+	'choc': Point_choc_initial,
+	'manv': Manoeuvre_principale_avant_accident,
+	'motor' :Type_motorisation_vehicule,
+	'occutc' : Nombre_d_occupants_dans_le_transport_en_commun
+}
+
+Usagers = {
+	'catu' : Categorie_usager,
+	'grav' : Gravite_blessure_usager,
+	'sexe' : Sexe_usager,
+	'trajet' : Motif_deplacement_lors_accident,
+	'secu1' : Securite1_usager,
+	'secu2' : Securite2_usager,
+	'secu3' : Securite3_usager,
+	'locp' : Localisation_pieton,
+	'actp' : Action_pieton,
+	'etatp' : Etat_pieton
+}
+
+
+

@@ -1,17 +1,6 @@
-from app import *
+from Accueil import *
+from fonctions import _max_width_
 
-
-# # Fonction pour convertir une adresse en coordonnées latitude/longitude
-
-# def geocode_address(address):
-#     geolocator = Nominatim(user_agent="geoapiExercises")
-#     try:
-#         location = geolocator.geocode(address)
-#         print(location.address)
-#         return location.latitude, location.longitude
-#     except:
-#         print("Erreur dans l'adresse")
-    
 
 
 
@@ -27,5 +16,6 @@ folium.Marker([df1['Latitude'], df1['Longitude']], popup=df1.Adresse_postale, to
 #     folium.Marker([accident['Latitude'], accident['Longitude']]).add_to(map)
 
 map.save("static/carte.html")
-folium_static(map)            
+
+folium_static(map, width=_max_width_(80), height=800)            
 
