@@ -12,9 +12,9 @@ import time
 import os 
 
 
-import locale
+from babel import Locale
 
-locale.setlocale(locale.LC_TIME, 'fr_FR')
+Locale.default_locale = 'fr_FR'
 
 # Création de Neo4jRepository object
 neo4j_uri       = os.environ.get('neo4j_uri')

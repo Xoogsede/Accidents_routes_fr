@@ -1,5 +1,5 @@
 from Accueil import *
-from fonctions import _max_width_
+import fonctions as fc
 
 
 
@@ -8,7 +8,7 @@ def geocode_address(address):
     geolocator = Nominatim(user_agent="geoapiExercises")
     try:
         location = geolocator.geocode(address)
-        print(location.address)
+        # print(location.address)
         return location.latitude, location.longitude
     except Exception:
         st.markdown(''' ## <font color='red'>🚨🚨 ERREUR DANS L'ADRESSE 🚨🚨</font>''', unsafe_allow_html=True)
@@ -49,7 +49,7 @@ def recherche():
             ## <font color='green'>Adresse incorrect, latitude et longitude initialisées sur la 🗼</font>''', unsafe_allow_html=True)
            
             
-        print(latitude, longitude)
+        # print(latitude, longitude)
         # Exécuter la requête Neo4j pour trouver les accidents dans un rayon autour de l'adresse
         query = f"""        
         WITH point({{latitude: {latitude}, longitude: {longitude}}}) AS pac
@@ -90,7 +90,7 @@ def recherche():
             df.insert(0, 'Date', df.pop('Date'), allow_duplicates=False)
 
             # Récupération des correspondances
-            df = trouv_corresp(df)
+            df = fc.trouv_corresp(df=df, dictionnaire=dc, dc_list=dc.__dict__)
 
 
             df['Date'] = pd.to_datetime(df['Date'])            
@@ -149,7 +149,7 @@ def recherche():
                 folium.Marker([accident['Latitude'], accident['Longitude']]).add_to(map)
 
             map.save("static/carte.html")
-            folium_static(map, width=_max_width_(80))            
+            folium_static(map, width=fc._max_width_(80))            
 
 
 

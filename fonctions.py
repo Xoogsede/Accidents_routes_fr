@@ -3,9 +3,9 @@ import streamlit as st
 # import Accueil as ac
 import pandas as pd
 
-import locale
+from babel import Locale
 
-locale.setlocale(locale.LC_TIME, 'fr_FR')
+Locale.default_locale = 'fr_FR'
 
 
 
