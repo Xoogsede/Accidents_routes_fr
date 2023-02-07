@@ -5,14 +5,12 @@ import folium
 from streamlit_folium import folium_static 
 import pandas as pd
 import matplotlib.pyplot as plt
-import dict_correspondance
-from  dict_correspondance import *
 import seaborn as sns
-import os
+# import dict_correspondance
+from  dict_correspondance import *
 
-import locale
+import os 
 
-locale.setlocale(locale.LC_TIME, 'fr_FR')
 
 # Création de Neo4jRepository object
 neo4j_uri       = os.environ.get('neo4j_uri')
@@ -31,7 +29,7 @@ except:
 graph = Graph(URI, auth=AUTH)
 
 
-from fonctions import data_query_transform as dqt, trouv_corresp, data, total_implique as tot
+from fonctions import data_query_transform as dqt, total_implique as tot
 
 
 st.set_page_config(
@@ -82,31 +80,30 @@ st.write(''' ''')
 
 st.write(''' ### 1 - Accident ayant impliqué le plus de véhicules et de victimes :  ''')
 
-from queries import *
-df1, acci_num1 = dqt(query)
+import queries as qr 
+df1, acci_num1 = dqt(qr.query)
 
 st.session_state['df1'] = df1
 
-# total_implique = graph.run(query1).to_data_frame()
+
 # df["Adresse_postale"] = df.Adresse_postale.str.replace("  ", "")
-# st.write(total_implique)
 
 
-query1 = query_stat(acci_num1)
-implique = tot(query1[0])
 
+query1 = qr.query_stat(acci_num1)
+
+implique1 = tot(query1[0])
 
 df11, _ = dqt(query1[1])
 df12, _ = dqt(query1[2])
 df13, _ = dqt(query1[3])
 
-
-vhl1 = df13['catv'].value_counts().reset_index()
+vhl2 = df13['catv'].value_counts().reset_index()
 
 
 st.write('''##### Cet accident s’est produit dans le département ''', df1['Département'][0],''', plus \
 précisément sur la''', df1.Adresse_postale[0], df1.Commune[0],''' et a impliqué ''', 
-implique.Nombre[0], implique.type[0][0].lower()+'s',''' dont ''', vhl1.iloc[0,1], ''' 🚴🏻‍♂️ et ''', implique.Nombre[1], implique.type[1][0].lower()," dont ",vhl1.iloc[0,1], " ", str(vhl1.iloc[0,0]).lower()+'s et ', vhl1.iloc[1,1], ' '+ str(vhl1.iloc[1,0]).lower()+'s.','''\
+implique1.Nombre[0], implique1.type[0][0].lower()+'s',''' dont ''', vhl2.iloc[0,1], ''' 🚴🏻‍♂️ et ''', implique1.Nombre[1], implique1.type[1][0].lower()," dont ",vhl2.iloc[0,1], " ", str(vhl2.iloc[0,0]).lower()+'s et ', vhl2.iloc[1,1], ' '+ str(vhl2.iloc[1,0]).lower()+'s.','''\
     Cet accident s’est produit le ''', df1.Date[0].strftime('%A %d %B %Y à %H:%M'),''', hors intersection \
         sous une ''', str(df1['Conditions_atmosphériques'][0]).lower(),'''.  
 
@@ -118,13 +115,23 @@ https://www.le-pays.fr/saint-just-saint-rambert-42170/faits-divers/une-quinzaine
 
 
 
-df2, acci_num2 = dqt(query5)
+df2, acci_num2 = dqt(qr.query5)
+
+query2 = qr.query_stat(acci_num2)
+
+implique2 = tot(query2[0])
+
+df21, _ = dqt(query2[1])
+df22, _ = dqt(query2[2])
+df23, _ = dqt(query2[3])
+
+vhl2 = df23['catv'].value_counts().reset_index()
 
 st.write(''' ### 2 - Accident ayant impliqué le plus de victimes :  ''')
 
 st.write('''##### Cet accident s’est produit dans le département ''', df2['Département'][0],''', plus \
 précisément sur la''', df2.Adresse_postale[0], df2.Commune[0],''' et a impliqué ''', 
-implique.Nombre[0], implique.type[0][0].lower()+'s',''' dont ''', vhl1.iloc[0,1], ''' 🚴🏻‍♂️ et ''', implique.Nombre[1], implique.type[1][0].lower()," dont ",vhl1.iloc[0,1], " ", str(vhl1.iloc[0,0]).lower()+'s et ', vhl1.iloc[1,1], ' '+ str(vhl1.iloc[1,0]).lower()+'s.','''\
+implique2.Nombre[0], implique2.type[0][0].lower()+'s',''' dont ''', vhl2.iloc[0,1], ''' 🚴🏻‍♂️ et ''', implique2.Nombre[1], implique2.type[1][0].lower()," dont ",vhl2.iloc[0,1], " ", str(vhl2.iloc[0,0]).lower()+'s et ', vhl2.iloc[1,1], ' '+ str(vhl2.iloc[1,0]).lower()+'s.','''\
     Cet accident s’est produit le ''', df2.Date[0].strftime('%A %d %B %Y à %H:%M'),''', hors intersection \
         sous une ''', str(df2['Conditions_atmosphériques'][0]).lower(),'''.''')
 

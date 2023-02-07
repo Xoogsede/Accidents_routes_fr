@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install nano less -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./app.py .
+COPY ./Accueil.py .
 COPY ./dict_correspondance.py .
 COPY ./static .
 COPY ./.streamlit .

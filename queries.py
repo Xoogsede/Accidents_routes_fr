@@ -4,7 +4,7 @@ RETURN n, size([(n)-[r]->() | r]) as degree
 ORDER BY degree DESC
 LIMIT 1;
 """
-from Accueil import acci_num1
+# from Accueil import acci_num1
 
 def query_stat(accident_number):
 

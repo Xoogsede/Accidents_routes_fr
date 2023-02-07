@@ -1,9 +1,13 @@
-import dict_correspondance as dc
 import streamlit as st
+import dict_correspondance as dc
 from Accueil import graph
 import pandas as pd
+
 import locale
+
 locale.setlocale(locale.LC_TIME, 'fr_FR')
+
+
 
 # funcion qui permet de s'assurer que les clés des dictionnaire sont bien les integer
 # utilisé dans le tableau 
@@ -62,6 +66,7 @@ def data(query):
 
         df = trouv_corresp(df)
         df['Date'] = pd.to_datetime(df['Date'])
+        st.write('Format de la date :', df.Date[0])
         df.fillna(-1, inplace=True)
         acci_num = df.Num_Acc[0]
     except:
