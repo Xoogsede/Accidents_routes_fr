@@ -2,11 +2,7 @@ import streamlit as st
 # import dict_correspondance as dc
 # import Accueil as ac
 import pandas as pd
-import locale
-
-# Définir la langue en français
-locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
-
+from babel.dates import format_date, format_datetime
 
 
 # funcion qui permet de s'assurer que les clés des dictionnaire sont bien les integer
@@ -61,14 +57,16 @@ def data(graph, query):
     df  = pd.DataFrame.from_records(results_query.iloc[:,0])
     # Transformation de la date 
     try:
-        df['Date'] = df['An'].astype('str') + '-' + df['Mois'].astype('str') + '-' + df['Jour'].astype('str') + ' ' + df['Heure']
-        df.insert(0, 'Date', df.pop('Date'), allow_duplicates=False)
+        df['DateTime'] = df['An'].astype('str') + '-' + df['Mois'].astype('str') + '-' + df['Jour'].astype('str') + ' ' + df['Heure']
+        df.insert(0, 'DateTime', df.pop('DateTime'), allow_duplicates=False)
         
         df.drop(columns=['An', 'Mois', 'Jour', 'Heure'], inplace=True)       
 
 
         df = trouv_corresp(df)
-        df['Date'] = pd.to_datetime(df['Date'])
+        df['DateTime'] = pd.to_datetime(df['DateTime'])
+        df['Date'] = df['DateTime'].apply(lambda x: format_date(x, format='full', locale='fr_FR'))
+        df['Heure'] = df['DateTime'].apply(lambda x: format_datetime(x, format='short', locale='fr_FR'))
         df.fillna(-1, inplace=True)
         acci_num = df.Num_Acc[0]
     except:
@@ -85,7 +83,9 @@ def data_query_transform(graph, query, dictionnaire):
     df, acci_num = data(graph, query)
     df = trouv_corresp(df, dictionnaire, dc_list)
     try:
-        df['Date'] = pd.to_datetime(df['Date'])
+        df['DateTime'] = pd.to_datetime(df['DateTime'])
+        df['Date'] = df['DateTime'].apply(lambda x: format_date(x, format='full', locale='fr_FR'))
+        df['Heure'] = df['DateTime'].apply(lambda x: format_datetime(x, format='short', locale='fr_FR'))
     except:
         pass
     return (df, acci_num)
