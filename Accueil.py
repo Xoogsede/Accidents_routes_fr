@@ -107,7 +107,7 @@ st.write('''##### Cet accident s’est produit dans le département ''', df1['D�
 précisément sur la''', df1.Adresse_postale[0], df1.Commune[0],''' et a impliqué ''', 
 implique1.Nombre[0], implique1.type[0][0].lower()+'s',''' dont ''', vhl2.iloc[0,1], ''' 🚴🏻‍♂️ et ''', implique1.Nombre[1], implique1.type[1][0].lower()," dont ",vhl2.iloc[0,1], " ", str(vhl2.iloc[0,0]).lower()+'s et ', vhl2.iloc[1,1], ' '+ str(vhl2.iloc[1,0]).lower()+'s.','''\
     Cet accident s’est produit le ''', df1.Date[0]," à ", df1.Heure[0],''', hors intersection \
-        sous une ''', str(df1['Conditions_atmosphériques'][0]).lower(),'''.  
+        sous des ''', str(df1['Conditions_atmosphériques'].name).replace('_', ' ').lower() + ' dites ', str(df1['Conditions_atmosphériques'][0]).lower(),'''.  
 
 En lien, l’article faisant référence à ce sinistre. 
 
@@ -135,5 +135,5 @@ st.write('''##### Cet accident s’est produit dans le département ''', df2['D�
 précisément sur la''', df2.Adresse_postale[0], df2.Commune[0],''' et a impliqué ''', 
 implique2.Nombre[0], implique2.type[0][0].lower()+'s',''' dont ''', vhl2.iloc[0,1], ''' 🚴🏻‍♂️ et ''', implique2.Nombre[1], implique2.type[1][0].lower()," dont ",vhl2.iloc[0,1], " ", str(vhl2.iloc[0,0]).lower()+'s et ', vhl2.iloc[1,1], ' '+ str(vhl2.iloc[1,0]).lower()+'s.','''\
     Cet accident s’est produit le ''', df2.Date[0]," à ", df2.Heure[0],''', hors intersection \
-        sous une ''', str(df2['Conditions_atmosphériques'][0]).lower(),'''.''')
+        sous des  ''', str(df2['Conditions_atmosphériques'].name).replace('_', ' ').lower() + ' dites ', str(df2['Conditions_atmosphériques'][0]).lower()+'s','''.''')
 
