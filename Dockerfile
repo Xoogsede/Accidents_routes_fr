@@ -13,22 +13,24 @@ RUN apt-get update && apt-get install nano less -y \
 
 COPY ./Accueil.py .
 COPY ./dict_correspondance.py .
+COPY ./pages/ ./pages/
+COPY ./image .
+COPY ./__init__.py .
+COPY ./fonctions.py .
+COPY ./setup.sh .
+COPY ./Procfile .
+COPY ./queries.py .
+COPY ./README.md .
+COPY ./LICENSE .
 COPY ./static .
-COPY ./.streamlit .
-COPY .streamlit/secrets.toml ./.streamlit/secrets.toml
+COPY ./.streamlit/ .
+COPY ./.streamlit/secrets.toml ./.streamlit/secrets.toml
 COPY ./requirements.txt .
 RUN pip install -U pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-
-FROM python:3.9-slim
-RUN apt-get update && rm -rf /var/cache/apk/*
-WORKDIR /app
-COPY --from=slim_env /app/app.py /app/
-
-ENV PASSWORD=PASSWORD
 ENV neo4j_uri="bolt ://0.0.0.0:7687"
 
 EXPOSE 8501
 
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "Accueil.py", "--server.port=8501", "--server.address=0.0.0.0"]

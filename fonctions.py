@@ -2,10 +2,10 @@ import streamlit as st
 # import dict_correspondance as dc
 # import Accueil as ac
 import pandas as pd
+import locale
 
-from babel import Locale
-
-Locale.default_locale = 'fr_FR'
+# Définir la langue en français
+locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
 
 
 
