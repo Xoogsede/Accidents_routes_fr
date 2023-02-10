@@ -60,13 +60,12 @@ def data(graph, query):
         df['DateTime'] = df['An'].astype('str') + '-' + df['Mois'].astype('str') + '-' + df['Jour'].astype('str') + ' ' + df['Heure']
         df.insert(0, 'DateTime', df.pop('DateTime'), allow_duplicates=False)
         
-        df.drop(columns=['An', 'Mois', 'Jour', 'Heure'], inplace=True)       
+        df.drop(columns=['An', 'Mois', 'Jour'], inplace=True)       
 
 
         df = trouv_corresp(df)
         df['DateTime'] = pd.to_datetime(df['DateTime'])
         df['Date'] = df['DateTime'].apply(lambda x: format_date(x, format='full', locale='fr_FR'))
-        df['Heure'] = df['DateTime'].apply(lambda x: format_datetime(x, format='short', locale='fr_FR'))
         df.fillna(-1, inplace=True)
         acci_num = df.Num_Acc[0]
     except:
@@ -85,7 +84,6 @@ def data_query_transform(graph, query, dictionnaire):
     try:
         df['DateTime'] = pd.to_datetime(df['DateTime'])
         df['Date'] = df['DateTime'].apply(lambda x: format_date(x, format='full', locale='fr_FR'))
-        df['Heure'] = df['DateTime'].apply(lambda x: format_datetime(x, format='short', locale='fr_FR'))
     except:
         pass
     return (df, acci_num)
