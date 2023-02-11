@@ -1,14 +1,7 @@
 import streamlit as st
 from py2neo import Graph
 from geopy.geocoders import Nominatim
-import folium
-from streamlit_folium import folium_static 
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import dict_correspondance as dc
-# from  dict_correspondance import *
-import time
 import os 
 
 
@@ -76,64 +69,15 @@ st.markdown(''' ###### Les données proviennent du fichier national des acci_num
 
 st.write('''   ''')
 
-st.write(''' ''')
-
-
-st.write(''' ### 1 - Accident ayant impliqué le plus de véhicules et de victimes :  ''')
-
+st.write('''   ''')
 
 df1, acci_num1 = fc.data_query_transform(graph=graph, query=qr.query, dictionnaire=dc)
 
-
 st.session_state['df1'] = df1
-
-
-# df["Adresse_postale"] = df.Adresse_postale.str.replace("  ", "")
-
-
-
-query1 = qr.query_stat(acci_num1)
-
-implique1 = fc.total_implique(graph, query1[0])
-
-df11, _ = fc.data_query_transform(graph=graph, query=query1[1], dictionnaire=dc)
-df12, _ = fc.data_query_transform(graph=graph, query=query1[2], dictionnaire=dc)
-df13, _ = fc.data_query_transform(graph=graph, query=query1[3], dictionnaire=dc)
-
-vhl2 = df13['catv'].value_counts().reset_index()
-
-
-st.write('''##### Cet accident s’est produit dans le département ''', df1['Département'][0],''', plus \
-précisément sur la''', df1.Adresse_postale[0], df1.Commune[0],''' et a impliqué ''', 
-implique1.Nombre[0], implique1.type[0][0].lower()+'s',''' dont ''', vhl2.iloc[0,1], ''' 🚴🏻‍♂️ et ''', implique1.Nombre[1], implique1.type[1][0].lower()," dont ",vhl2.iloc[0,1], " ", str(vhl2.iloc[0,0]).lower()+'s et ', vhl2.iloc[1,1], ' '+ str(vhl2.iloc[1,0]).lower()+'s.','''\
-    Cet accident s’est produit le ''', df1.Date[0]," à ", df1.Heure[0],''', hors intersection \
-        sous des ''', str(df1['Conditions_atmosphériques'].name).replace('_', ' ').lower() + ' dites ', str(df1['Conditions_atmosphériques'][0]).lower(),'''.  
-
-En lien, l’article faisant référence à ce sinistre. 
-
-https://www.le-pays.fr/saint-just-saint-rambert-42170/faits-divers/une-quinzaine-de-cyclistes-heurtes-par-une-voiture-entre-saint-cyprien-et-saint-just-saint-rambert_13928751/
-
-  ''')
-
-
 
 df2, acci_num2 = fc.data_query_transform(graph=graph, query=qr.query5, dictionnaire=dc)
 
-query2 = qr.query_stat(acci_num2)
+df3, acci_num3 = fc.data_query_transform(graph=graph, query=qr.query6, dictionnaire=dc)
 
-implique2 = fc.total_implique(graph, query2[0])
-
-df21, _ = fc.data_query_transform(graph=graph, query=query2[1], dictionnaire=dc)
-df22, _ = fc.data_query_transform(graph=graph, query=query2[2], dictionnaire=dc)
-df23, _ = fc.data_query_transform(graph=graph, query=query2[3], dictionnaire=dc)
-
-vhl2 = df23['catv'].value_counts().reset_index()
-
-st.write(''' ### 2 - Accident ayant impliqué le plus de victimes :  ''')
-
-st.write('''##### Cet accident s’est produit dans le département ''', df2['Département'][0],''', plus \
-précisément sur la''', df2.Adresse_postale[0], df2.Commune[0],''' et a impliqué ''', 
-implique2.Nombre[0], implique2.type[0][0].lower()+'s',''' dont ''', vhl2.iloc[0,1], ''' 🚴🏻‍♂️ et ''', implique2.Nombre[1], implique2.type[1][0].lower()," dont ",vhl2.iloc[0,1], " ", str(vhl2.iloc[0,0]).lower()+'s et ', vhl2.iloc[1,1], ' '+ str(vhl2.iloc[1,0]).lower()+'s.','''\
-    Cet accident s’est produit le ''', df2.Date[0]," à ", df2.Heure[0],''', hors intersection \
-        sous des  ''', str(df2['Conditions_atmosphériques'].name).replace('_', ' ').lower() + ' dites ', str(df2['Conditions_atmosphériques'][0]).lower()+'s','''.''')
-
+df5 = graph.run(qr.query7).to_data_frame()
+# , acci_num5 = fc.data(graph=graph, query=)

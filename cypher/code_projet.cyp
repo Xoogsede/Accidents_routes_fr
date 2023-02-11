@@ -221,7 +221,7 @@ SET a.Longitude = location.longitude;
 
 
 // Les 5 départements les plus accidentogène
-MATCH (a:Accident) RETURN a.`Département`, count(*) as nb ORDER BY nb DESC LIMIT 5
+MATCH (a:Accident) RETURN a.`Département` as Departement, count(*) as nb_victimes ORDER BY nb_victimes DESC LIMIT 5
 
 
 //Classement des fréquences d'accident par année et mois entre 2019 et 2020 

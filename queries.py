@@ -41,3 +41,17 @@ WITH a, count(r) as degree
 RETURN a, degree
 ORDER BY degree DESC
 LIMIT 1;'''
+
+
+# Accident ayant impliqué le plus de véhicules
+query6 = f'''
+MATCH (a:Accident)-[r]->(v:Vehicules)
+WITH a, count(r) as degree
+RETURN a, degree
+ORDER BY degree DESC
+LIMIT 1;'''
+
+# Les 5 départements les plus accidentogène
+query7 = f'''
+MATCH (a:Accident) RETURN a.`Département` as Departement, count(*) as nb_victimes ORDER BY nb_victimes DESC LIMIT 5
+'''

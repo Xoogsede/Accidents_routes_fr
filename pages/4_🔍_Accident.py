@@ -1,6 +1,6 @@
 from Accueil import *
-import fonctions as fc
-
+# import fonctions as fc
+from fonctions import *
 
 
 # Fonction pour convertir une adresse en coordonnées latitude/longitude
