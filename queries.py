@@ -55,3 +55,24 @@ LIMIT 1;'''
 query7 = f'''
 MATCH (a:Accident) RETURN a.`Département` as Departement, count(*) as nb_victimes ORDER BY nb_victimes DESC LIMIT 5
 '''
+
+# Classement des fréquences d'accident par année et mois entre 2019 et 2021 
+query8 = f'''
+MATCH (n:Accident) 
+RETURN n.An as Annee,n.Mois AS mois, COUNT (*) AS nombre_accident 
+ORDER BY nombre_accident DESC;'''
+
+
+# Classement des fréquences d'accident par année et mois entre 2019 et 2021 en fonction du nombre de personnes impliquées et de leur état
+query9 = f'''
+MATCH (u:Usager)-[r:EST_CONCERNE]->(a:Accident)
+RETURN ToInteger(a.An) AS Annee,ToInteger(a.Mois) AS mois, 
+    COUNT (distinct(a.Num_Acc)) AS nombre_accident , 
+    COUNT (a.Num_Acc)AS nombre_personne_impliqué,
+    SUM(CASE WHEN(u.grav="1") THEN 1 ELSE 0 END) AS dont_ind,
+    SUM(CASE WHEN(u.grav="2") THEN 1 ELSE 0 END) AS dont_dcd,
+    SUM(CASE WHEN(u.grav="3") THEN 1 ELSE 0 END) AS dont_hosp,
+    SUM(CASE WHEN(u.grav="4") THEN 1 ELSE 0 END) AS dont_bles_leg,
+    SUM(CASE WHEN(u.grav=" -1") THEN 1 ELSE 0 END) AS non_rens
+ORDER BY nombre_accident DESC;
+'''

@@ -80,4 +80,7 @@ df2, acci_num2 = fc.data_query_transform(graph=graph, query=qr.query5, dictionna
 df3, acci_num3 = fc.data_query_transform(graph=graph, query=qr.query6, dictionnaire=dc)
 
 df5 = graph.run(qr.query7).to_data_frame()
-# , acci_num5 = fc.data(graph=graph, query=)
+
+df6 = graph.run(qr.query8).to_data_frame()
+
+df7 = graph.run(qr.query9).to_data_frame()
