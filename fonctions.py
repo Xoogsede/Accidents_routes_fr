@@ -172,6 +172,7 @@ def stat_loc_data(implique1, df1, df12, df13):
     
     tb(df12, df13)
 
+    return None
     
 
 

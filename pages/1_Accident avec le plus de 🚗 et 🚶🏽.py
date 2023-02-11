@@ -29,36 +29,3 @@ https://www.le-pays.fr/saint-just-saint-rambert-42170/faits-divers/une-quinzaine
 fc.stat_loc_data(implique1, df1, df12, df13)
 
 
-# st.subheader("Typologie d'accident")  
-# fig = plt.figure(figsize = (10, 5))           
-
-# ax = sns.countplot(x = 'Type_de_collision', hue='sexe', data = df1)
-# ax.set_xticklabels(ax.get_xticklabels(), rotation = 90)
-# ax.set_title("Catégorie d'accident")
-# ax.set_xlabel("Type d'accident")
-# ax.set_ylabel("Nombre d'accident")
-
-# st.pyplot(fig)
-
-
-
-# # Conditions atmosphérique
-# st.subheader("Conditions météo lors des accidents")
-# fig = plt.figure(figsize = (10, 5))                     
-
-# ax = sns.countplot(x = 'Conditions_atmosphériques', hue='sexe', data = df1)
-# ax.set_xticklabels(ax.get_xticklabels(), rotation = 90)
-# ax.set_title("Conditions atmosphériques")
-# ax.set_xlabel("Conditions météo")
-# ax.set_ylabel("Nombre d'accident")
-# st.pyplot(fig)
-
-# st.subheader("Catégories des véhicules")
-# fig = plt.figure(figsize = (10, 5))                     
-
-# ax = sns.countplot(x = 'catv', hue='sexe', data = df1)
-# ax.set_xticklabels(ax.get_xticklabels(), rotation = 90)
-# ax.set_title("Catégories des véhicules impliqués")
-# ax.set_xlabel("Conditions météo")
-# ax.set_ylabel("Nombre d'accident")
-# st.pyplot(fig)
