@@ -7,6 +7,7 @@ import seaborn as sns
 import pandas as pd
 from babel.dates import format_date
 
+
 # funcion qui permet de s'assurer que les clés des dictionnaire sont bien les integer
 # utilisé dans le tableau 
 def dic_convert(dictionnaire):
@@ -111,9 +112,9 @@ def _max_width_(prcnt_width:int = 75):
 
 
 def tb(df1, df2):
-    st.write('''#### Usagers impliqués impliqué dans l'accident''', df1)
+    st.write('''#### Usagers impliqués dans l'accident''', df1)
 
-    st.write('''#### Véhicules impliqués impliqué dans l'accident''', df2)
+    st.write('''#### Véhicules impliqués dans l'accident''', df2)
     return None
 
 
@@ -168,7 +169,7 @@ def stat_loc_data(implique1, df1, df12, df13):
     st.write('''   ''')
 
     st.write(''' # Données de l'accident ''', df1)
-    st.write(implique1.Nombre[0]," usagers impliqués, majoritairement des  ", implique1)
+    st.write(implique1.Nombre[0]," usagers impliqués ", implique1)
     
     tb(df12, df13)
 

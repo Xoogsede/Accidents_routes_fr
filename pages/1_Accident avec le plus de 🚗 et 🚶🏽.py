@@ -25,7 +25,7 @@ https://www.le-pays.fr/saint-just-saint-rambert-42170/faits-divers/une-quinzaine
 
   ''')
 
-
-fc.stat_loc_data(implique1, df1, df12, df13)
+if df11 is not None and df12 is not None and df13 is not None:
+  fc.stat_loc_data(implique1, df1, df12, df13)
 
 

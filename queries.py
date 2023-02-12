@@ -69,10 +69,10 @@ MATCH (u:Usager)-[r:EST_CONCERNE]->(a:Accident)
 RETURN ToInteger(a.An) AS Annee,ToInteger(a.Mois) AS mois, 
     COUNT (distinct(a.Num_Acc)) AS nombre_accident , 
     COUNT (a.Num_Acc)AS nombre_personne_impliqué,
-    SUM(CASE WHEN(u.grav="1") THEN 1 ELSE 0 END) AS dont_ind,
-    SUM(CASE WHEN(u.grav="2") THEN 1 ELSE 0 END) AS dont_dcd,
-    SUM(CASE WHEN(u.grav="3") THEN 1 ELSE 0 END) AS dont_hosp,
-    SUM(CASE WHEN(u.grav="4") THEN 1 ELSE 0 END) AS dont_bles_leg,
-    SUM(CASE WHEN(u.grav=" -1") THEN 1 ELSE 0 END) AS non_rens
+    SUM(CASE WHEN(u.grav="1") THEN 1 ELSE 0 END) AS indimnes,
+    SUM(CASE WHEN(u.grav="2") THEN 1 ELSE 0 END) AS décédés,
+    SUM(CASE WHEN(u.grav="3") THEN 1 ELSE 0 END) AS hospitalisés,
+    SUM(CASE WHEN(u.grav="4") THEN 1 ELSE 0 END) AS légers,
+    SUM(CASE WHEN(u.grav=" -1") THEN 1 ELSE 0 END) AS non_renseignés
 ORDER BY nombre_accident DESC;
 '''

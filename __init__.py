@@ -1,1 +1,1 @@
-from fonctions import *
+import fonctions as fc
