@@ -1,4 +1,5 @@
 from Accueil import *
+import fonctions as fc
 
 st.write(''' # 3 - Accident ayant impliqué le plus de véhicules :  ''')
 
