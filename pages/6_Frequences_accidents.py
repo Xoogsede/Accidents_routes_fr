@@ -20,7 +20,7 @@ st.pyplot(fig)
 st.write(''' ## Fréquences d'accident par année et mois entre 2019 et 2021 en fonction du nombre de personnes impliquées et de leur état ''')
 for titre in df7.columns:
     if titre not in ['Annee', 'mois', "nombre_accident"]:
-        st.write(titre.replace("_", " ").replace("nombre", "Nombre de"))
+        st.subheader(titre.replace("_", " ").replace("nombre", "Nombre de"))
         fig = fc.plt.figure(figsize = (10, 5)) 
         ax = fc.sns.barplot(x='Annee',  y=titre, hue='mois', 
                             data=df7, order=df7.sort_values('Annee', 
@@ -29,4 +29,4 @@ for titre in df7.columns:
 
         st.pyplot(fig)
 
-st.write("Données", df7)
+st.table(df7)
