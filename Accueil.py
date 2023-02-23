@@ -84,3 +84,5 @@ df5 = graph.run(qr.query7).to_data_frame()
 df6 = graph.run(qr.query8).to_data_frame()
 
 df7 = graph.run(qr.query9).to_data_frame()
+
+df8 = graph.run(qr.query10).to_data_frame()

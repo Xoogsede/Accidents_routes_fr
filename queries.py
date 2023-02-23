@@ -76,3 +76,18 @@ RETURN ToInteger(a.An) AS Annee,ToInteger(a.Mois) AS mois,
     SUM(CASE WHEN(u.grav=" -1") THEN 1 ELSE 0 END) AS non_renseignés
 ORDER BY nombre_accident DESC;
 '''
+
+
+# Profil Conducteur les plus à risque
+query10 = f'''
+MATCH (u:Usager)-[r:EST_CONCERNE]->(a:Accident) 
+WHERE a.An IS NOT NULL // à modifier si 
+AND  u.an_nais IS NOT NULL 
+AND u.catu = "1" 
+    RETURN  CASE WHEN u.sexe="1" THEN"Homme"
+        ELSE CASE WHEN u.sexe="2" THEN "Femme" ELSE "Non renseigné" END 
+        END AS sexe, 
+        (ToInteger(a.An)-Tointeger(u.an_nais)) AS Age,
+        COUNT(*) AS nb_accident 
+        ORDER BY nb_accident DESC
+'''
