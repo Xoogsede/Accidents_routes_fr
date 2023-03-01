@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install nano less -y \
 
 COPY ./Accueil.py .
 COPY ./dict_correspondance.py .
-COPY ./pages/ ./pages/
+COPY ./pages/* ./pages/
 COPY ./image .
 COPY ./__init__.py .
 COPY ./fonctions.py .
@@ -22,10 +22,10 @@ COPY ./Procfile .
 COPY ./queries.py .
 COPY ./README.md .
 COPY ./LICENSE .
-COPY ./static .
-COPY ./.streamlit/ .
-COPY ./.streamlit/secrets.toml ./.streamlit/secrets.toml
+COPY ./static ./static
+COPY ./.streamlit/* ./.streamlit/
 COPY ./requirements.txt .
+
 RUN pip install -U pip
 RUN pip install --no-cache-dir -r requirements.txt
 

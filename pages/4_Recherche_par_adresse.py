@@ -1,6 +1,6 @@
 from Accueil import *
 # import fonctions as fc
-from fonctions import *
+import fonctions as fc
 
 
 # Fonction pour convertir une adresse en coordonnées latitude/longitude
@@ -33,7 +33,7 @@ def recherche():
     cp = st.text_input("Code postal", "", key="cp")
     num_voie = st.text_input("N° et rue", "", key="Adresse")
     address = cp + ', '+ num_voie
-    dt_deb = st.date_input("date de début",  label_visibility='visible', key="deb", value=pd.to_datetime("2018-12-31"))
+    dt_deb = st.date_input("date de début",  label_visibility='visible', key="deb", value=fc.pd.to_datetime("2018-12-31"))
     dt_fin = st.date_input(label="date de fin", label_visibility='visible', key="fin")
 
     # Saisie du rayon de recherche
@@ -66,12 +66,12 @@ def recherche():
 
         # convertir les résultats en DataFrame et concaténation
         try:
-            acc = pd.DataFrame.from_records(results["a"])
-            usg = pd.DataFrame.from_records(results["u"])
-            vhc = pd.DataFrame.from_records(results["v"])
+            acc = fc.pd.DataFrame.from_records(results["a"])
+            usg = fc.pd.DataFrame.from_records(results["u"])
+            vhc = fc.pd.DataFrame.from_records(results["v"])
             df = acc.merge(usg.merge(vhc, how='right', on='Num_Acc', suffixes=('_left', '_right')), how='right', on='Num_Acc', suffixes=('_left', '_right'))
         except:
-            df = pd.DataFrame()   
+            df = fc.pd.DataFrame()   
         
 
         # Afficher les résultats de la requête sous forme de graphe Neo4j
@@ -93,7 +93,7 @@ def recherche():
             df = fc.trouv_corresp(df=df, dictionnaire=dc, dc_list=dc.__dict__)
 
 
-            df['Date'] = pd.to_datetime(df['Date'])            
+            df['Date'] = fc.pd.to_datetime(df['Date'])            
             df["Adresse_postale"] = df.Adresse_postale.str.replace("  ", "")
            
 
@@ -105,9 +105,9 @@ def recherche():
 
             
             st.subheader("Typologie d'accident")  
-            fig = plt.figure(figsize = (10, 5))           
+            fig = fc.plt.figure(figsize = (10, 5))           
 
-            ax = sns.countplot(x = 'Type_de_collision', hue='sexe', data = df)
+            ax = fc.sns.countplot(x = 'Type_de_collision', hue='sexe', data = df)
             ax.set_xticklabels(ax.get_xticklabels(), rotation = 90)
             ax.set_title("Catégorie d'accident")
             ax.set_xlabel("Type d'accident")
@@ -119,9 +119,9 @@ def recherche():
 
             # Conditions atmosphérique
             st.subheader("Conditions météo lors des accidents")
-            fig = plt.figure(figsize = (10, 5))                     
+            fig = fc.plt.figure(figsize = (10, 5))                     
             
-            ax = sns.countplot(x = 'Conditions_atmosphériques', hue='sexe', data = df)
+            ax = fc.sns.countplot(x = 'Conditions_atmosphériques', hue='sexe', data = df)
             ax.set_xticklabels(ax.get_xticklabels(), rotation = 90)
             ax.set_title("Conditions atmosphériques")
             ax.set_xlabel("Conditions météo")
@@ -129,9 +129,9 @@ def recherche():
             st.pyplot(fig)
 
             st.subheader("Catégories des véhicules")
-            fig = plt.figure(figsize = (10, 5))                     
+            fig = fc.plt.figure(figsize = (10, 5))                     
             
-            ax = sns.countplot(x = 'catv', hue='sexe', data = df)
+            ax = fc.sns.countplot(x = 'catv', hue='sexe', data = df)
             ax.set_xticklabels(ax.get_xticklabels(), rotation = 90)
             ax.set_title("Catégories des véhicules impliqués")
             ax.set_xlabel("Catégories")
@@ -141,15 +141,15 @@ def recherche():
             # Afficher les résultats sur une carte
             st.title("Localisation géographique")        
             # Création de la carte
-            map = folium.Map(location=[latitude, longitude], zoom_start=13)
-            folium.Marker([latitude, longitude], popup=address, tooltip="<strong>"f'{address}'"</strong>", 
-                        icon=folium.Icon(color='red')).add_to(map)
+            map = fc.folium.Map(location=[latitude, longitude], zoom_start=13)
+            fc.folium.Marker([latitude, longitude], popup=address, tooltip="<strong>"f'{address}'"</strong>", 
+                        icon=fc.folium.Icon(color='red')).add_to(map)
             # Ajouter les marqueurs pour les accidents
             for _ , accident in acc[['Latitude', 'Longitude']].iterrows():
-                folium.Marker([accident['Latitude'], accident['Longitude']]).add_to(map)
+                fc.folium.Marker([accident['Latitude'], accident['Longitude']]).add_to(map)
 
             map.save("static/carte.html")
-            folium_static(map, width=fc._max_width_(80))            
+            fc.folium_static(map, width=fc._max_width_(80))            
 
 
 
