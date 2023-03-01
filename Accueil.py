@@ -21,8 +21,6 @@ except:
 # Connexion à la base de données Neo4j
 graph = Graph(URI, auth=AUTH)
 
-# time.sleep(15)
-# from fonctions import fc.data_query_transform as fc.data_query_transform, total_implique as tot
 import  fonctions as fc
 
 st.set_page_config(
@@ -38,7 +36,7 @@ import queries as qr
 
 
 st.write("# Bienvenue dans l'application de suivi des 🚘💥🚗 de la route en France 👋🏾")
-# st.sidebar.success("Navigez pour voir le contenu")
+
 
 st.markdown(''' ###### Les données proviennent du fichier national des acci_num1s corporels de la circulation administré par \
     l’Observatoire National Interministériel de la Sécurité Routière disponibles sur le site www.data.gouv.fr . \
