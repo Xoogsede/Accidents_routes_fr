@@ -1,5 +1,4 @@
 from Accueil import *
-# import fonctions as fc
 import fonctions as fc
 
 
