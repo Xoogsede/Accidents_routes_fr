@@ -6,7 +6,7 @@
 ### Streamlit app ###
 .brouillon.py
 .brouillon.py
-./.streamlit/secrets.toml
+.streamlit/secrets.toml
 
 ### Flask app ###
 instance/*
