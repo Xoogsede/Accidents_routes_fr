@@ -63,6 +63,8 @@ st.markdown(''' ###### Les données proviennent du fichier national des acci_num
     sur les graphes, développé en Java par la société Neo technology. Le produit existe depuis 2000, la version 1.0 \
         est sortie en février 2010 (source wikipedia)
 
+https://amzn.to/3siQDCu
+
  ''')
 
 st.write('''   ''')
@@ -87,4 +89,3 @@ df8 = graph.run(qr.query10).to_data_frame()
 
 df9 = graph.run(qr.query11).to_data_frame()
 
-st.markdown('''https://amzn.to/3slGrcn''')
