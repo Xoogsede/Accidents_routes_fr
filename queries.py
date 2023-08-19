@@ -91,3 +91,22 @@ AND u.catu = "1"
         COUNT(*) AS nb_accident 
         ORDER BY nb_accident DESC
 '''
+
+
+# lieux des accidents en fonction des catégories de route sur les 5 départements en Hauts-de-France : Aisne (02),Nord (59),Oise (60),Pas-de-Calais (62),Somme (80)
+query11 = f'''
+WITH ["59", "62", "80", "02", "60"] as dep
+MATCH (a:Accident)
+WHERE ANY (i IN dep WHERE i = a.`Département`) 
+MATCH (a:Accident)-[:EST_LOCALISE]->(l:Lieux)
+RETURN CASE l.Categorie 
+WHEN "1" THEN "Autoroute" 
+      WHEN "2" THEN"Route_nationale" 
+         WHEN "3" THEN"Route_Departementale"
+             WHEN "4" THEN "Voie_Communales"
+                 WHEN  "5" THEN "Hors_reseau_public"
+                     WHEN "6" THEN "Parc_de_stationnement_ouvert_a_la_circulation_publique"
+                         WHEN "7" THEN "Routes_de_metropole_urbaine" 
+                             WHEN "9" THEN "autre__voie__Numero_de_la_route." 
+                                 END AS Catégorie_route , count(a.Num_Acc) AS nb_accident
+'''
