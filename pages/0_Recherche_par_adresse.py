@@ -9,8 +9,9 @@ def geocode_address(address):
         location = geolocator.geocode(address)
         # print(location.address)
         return location.latitude, location.longitude
-    except Exception:
+    except Exception as e:
         st.markdown(''' ## <font color='red'>🚨🚨 ERREUR DANS L'ADRESSE 🚨🚨</font>''', unsafe_allow_html=True)
+        print(e)
         pass
 
 
@@ -31,7 +32,8 @@ def recherche():
     # Saisie de l'adresse postale
     cp = st.text_input("Code postal", "", key="cp")
     country = st.text_input(label="Pays", value="France", key="country")
-    num_voie = st.text_input("N° et rue", "", key="Adresse")
+    country = country.replace("é", "e").upper()
+    num_voie = st.text_input("N° et rue", "", key="Adresse").lower()
     address = cp + ', ' + country + ', '+ num_voie
     dt_deb = st.date_input("date de début",  label_visibility='visible', key="deb", value=fc.pd.to_datetime("2018-12-31"))
     dt_fin = st.date_input(label="date de fin", label_visibility='visible', key="fin")
