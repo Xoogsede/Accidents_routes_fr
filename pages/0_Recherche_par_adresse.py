@@ -30,8 +30,9 @@ def recherche():
 
     # Saisie de l'adresse postale
     cp = st.text_input("Code postal", "", key="cp")
+    country = st.text_input(label="Pays", value="France", key="country")
     num_voie = st.text_input("N° et rue", "", key="Adresse")
-    address = cp + ', '+ num_voie
+    address = cp + ', ' + country + ', '+ num_voie
     dt_deb = st.date_input("date de début",  label_visibility='visible', key="deb", value=fc.pd.to_datetime("2018-12-31"))
     dt_fin = st.date_input(label="date de fin", label_visibility='visible', key="fin")
 

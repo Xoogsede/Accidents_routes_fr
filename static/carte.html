@@ -12,7 +12,7 @@
     <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
     <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_51d587818e5b55382d01195dc3300188 {
+                #map_6287e78f07290cc065b3421fb1407d28 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -39,16 +39,16 @@
 <body>
     
     
-            <div class="folium-map" id="map_51d587818e5b55382d01195dc3300188" ></div>
+            <div class="folium-map" id="map_6287e78f07290cc065b3421fb1407d28" ></div>
         
 </body>
 <script>
     
     
-            var map_51d587818e5b55382d01195dc3300188 = L.map(
-                "map_51d587818e5b55382d01195dc3300188",
+            var map_6287e78f07290cc065b3421fb1407d28 = L.map(
+                "map_6287e78f07290cc065b3421fb1407d28",
                 {
-                    center: [45.0, 4.0],
+                    center: [48.0, 6.0],
                     crs: L.CRS.EPSG3857,
                     zoom: 13,
                     zoomControl: true,
@@ -60,42 +60,45 @@
 
         
     
-            var tile_layer_0abdb3978e265ce8d8eaee6563e4cc3d = L.tileLayer(
-                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {"attribution": "Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
-            ).addTo(map_51d587818e5b55382d01195dc3300188);
+            var tile_layer_934ae9682f8590f5bbab58121666d297 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detectRetina": false, "maxNativeZoom": 19, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
         
     
-            var marker_91a7656f8bc90891e0bc332afdd26210 = L.marker(
-                [45.0, 4.0],
+            tile_layer_934ae9682f8590f5bbab58121666d297.addTo(map_6287e78f07290cc065b3421fb1407d28);
+        
+    
+            var marker_8ba29401b129d4df6349ec698f188dbc = L.marker(
+                [48.0, 6.0],
                 {}
-            ).addTo(map_51d587818e5b55382d01195dc3300188);
+            ).addTo(map_6287e78f07290cc065b3421fb1407d28);
         
     
-            var icon_c284481bd990124ec49a98d345e9cfbe = L.AwesomeMarkers.icon(
+            var icon_5fb08c994a8ab83a64288c2af414c2bb = L.AwesomeMarkers.icon(
                 {"extraClasses": "fa-rotate-0", "icon": "info-sign", "iconColor": "white", "markerColor": "red", "prefix": "glyphicon"}
             );
-            marker_91a7656f8bc90891e0bc332afdd26210.setIcon(icon_c284481bd990124ec49a98d345e9cfbe);
+            marker_8ba29401b129d4df6349ec698f188dbc.setIcon(icon_5fb08c994a8ab83a64288c2af414c2bb);
         
     
-        var popup_e690c6f597bd462e02033cbd3691a813 = L.popup({"maxWidth": "100%"});
+        var popup_c3bad2cc0b4e474220ae8108eb664d0b = L.popup({"maxWidth": "100%"});
 
         
             
-                var html_a65b97244b6b6f625fc0e86dbeb0c79f = $(`<div id="html_a65b97244b6b6f625fc0e86dbeb0c79f" style="width: 100.0%; height: 100.0%;">0    Route de Saint-Cyprien Name: Adresse_postale, dtype: object</div>`)[0];
-                popup_e690c6f597bd462e02033cbd3691a813.setContent(html_a65b97244b6b6f625fc0e86dbeb0c79f);
+                var html_9a7a3a1a28dc57c5c917e7b015384e9e = $(`<div id="html_9a7a3a1a28dc57c5c917e7b015384e9e" style="width: 100.0%; height: 100.0%;">0    Route de Moyenpal Name: Adresse_postale, dtype: object</div>`)[0];
+                popup_c3bad2cc0b4e474220ae8108eb664d0b.setContent(html_9a7a3a1a28dc57c5c917e7b015384e9e);
             
         
 
-        marker_91a7656f8bc90891e0bc332afdd26210.bindPopup(popup_e690c6f597bd462e02033cbd3691a813)
+        marker_8ba29401b129d4df6349ec698f188dbc.bindPopup(popup_c3bad2cc0b4e474220ae8108eb664d0b)
         ;
 
         
     
     
-            marker_91a7656f8bc90891e0bc332afdd26210.bindTooltip(
+            marker_8ba29401b129d4df6349ec698f188dbc.bindTooltip(
                 `<div>
-                     <strong>0    Route de Saint-Cyprien
+                     <strong>0    Route de Moyenpal
 Name: Adresse_postale, dtype: object</strong>
                  </div>`,
                 {"sticky": true}
