@@ -5,7 +5,7 @@ pandas==1.5.2
 py2neo==2021.2.4
 pyvis==0.3.1
 seaborn==0.13.1
-streamlit==1.18.1
+streamlit==1.29.0
 streamlit_folium==0.18.0
 protobuf==4.23.4
 Babel==2.14.0
