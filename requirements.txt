@@ -1,5 +1,6 @@
 folium==0.15.1
 geopy==2.4.1
+geocoder==1.38.1
 matplotlib==3.8.2
 pandas==1.5.2
 py2neo==2021.2.4

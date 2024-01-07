@@ -1,6 +1,6 @@
 from Accueil import *
 import fonctions as fc
-
+import geocoder
 
 # Fonction pour convertir une adresse en coordonnées latitude/longitude
 def geocode_address(address):
@@ -13,6 +13,15 @@ def geocode_address(address):
         st.markdown(''' ## <font color='red'>🚨🚨 ERREUR DANS L'ADRESSE 🚨🚨</font>''', unsafe_allow_html=True)
         print(e)
         pass
+
+def get_latitude_longitude(address):
+    try:
+        g = geocoder.osm(address)
+        return tuple(g.latlng)
+    except Exception as e:
+            st.markdown(''' ## <font color='red'>🚨🚨 ERREUR DANS L'ADRESSE 🚨🚨</font>''', unsafe_allow_html=True)
+            print(e)
+            pass
 
 
 def recherche():
@@ -44,7 +53,7 @@ def recherche():
     if st.button("Rechercher") and address!="":
         # Convertir l'adresse en coordonnées
         try:
-            latitude, longitude = geocode_address(address)
+            latitude, longitude = get_latitude_longitude(address)
         except:
             latitude, longitude  = (48.8582532, 2.294287)
             st.markdown('''
