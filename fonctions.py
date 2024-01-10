@@ -126,7 +126,7 @@ def stat_loc_data(implique1, df1, df12, df13):
     st.write(''' ''')
 
 
-    st.title("📈 Statistique 📊")
+    st.title("📈 Représentation Graphique 📊")
 
     total_accident = df1[["Type_de_collision"]].count().tolist()[0]
     st.write(''' ## Accident ayant impliqué ''', implique1.Nombre[0], implique1.type[0][0].lower()+'s',''' et ''', implique1.Nombre[1], implique1.type[1][0].lower())
@@ -177,4 +177,23 @@ def stat_loc_data(implique1, df1, df12, df13):
     return None
     
 
+# Fonction pour convertir une adresse en coordonnées latitude/longitude
+def geocode_address(address):
+    geolocator = Nominatim(user_agent="geoapiExercises")
+    try:
+        location = geolocator.geocode(address)
+        # print(location.address)
+        return location.latitude, location.longitude
+    except Exception as e:
+        st.markdown(''' ## <font color='red'>🚨🚨 ERREUR DANS L'ADRESSE 🚨🚨</font>''', unsafe_allow_html=True)
+        print(e)
+        pass
 
+def get_latitude_longitude(address):
+    try:
+        g = geocoder.osm(address)
+        return tuple(g.latlng)
+    except Exception as e:
+            st.markdown(''' ## <font color='red'>🚨🚨 ERREUR DANS L'ADRESSE 🚨🚨</font>''', unsafe_allow_html=True)
+            print(e)
+            pass

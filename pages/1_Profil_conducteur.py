@@ -46,7 +46,7 @@ st.subheader('Dispersion des accidents par age')
 fig, ax = fc.plt.subplots(1, 1, figsize = (10, 5), dpi=300) 
 fc.sns.boxplot(data=dispertion, 
                     x='Age', y='sexe', hue_order=df8.sexe.sort_values().unique())
-ax.set_xticklabels(ax.get_xticklabels(), rotation = 45)
+ax.set_xticklabels(ax.get_xticklabels(), rotation = 0)
 
 ax.legend()
 ax.set_xlabel('Age')
@@ -55,7 +55,8 @@ st.pyplot(fig)
 
 st.markdown('''##### 
 50 pourcent des accidents concerna la tranche d'age 26 - 51 pour les hommes et 26 - 53.
-Cela signifie que 25 \% des accidents concernes les jeunes de moins de 26''')
+
+Cela signifie que 1/4 des accidents concernes les jeunes de moins de 26 ans''')
 
 mean = df8.groupby(['sexe'])['Somme_cumulée'].mean()
 median = df8.groupby(['sexe'])['Somme_cumulée'].median()
@@ -81,6 +82,8 @@ L'age moyen et l'age médian sont assez proches pour les hommes comme pour les f
 fig, ax = fc.plt.subplots()
 fc.sns.lineplot(data=df8, x='Age', y="Somme_cumulée", hue="sexe")
 for i, sexe in enumerate(df8.sexe.unique()):
+    if sexe == "Non renseigné":
+        continue
     mean_age = mean_age_by_sexe.loc[sexe][0]
     fc.plt.axvline(x=mean_age, color=color_means[i % len(color_means)])
     fc.plt.annotate(f"{sexe} : moyenne d\'age {mean_age:.2f}", xy=(mean_age, position_label_moyenne[i]), 

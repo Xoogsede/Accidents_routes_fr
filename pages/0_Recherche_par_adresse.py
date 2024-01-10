@@ -2,27 +2,6 @@ from Accueil import *
 import fonctions as fc
 import geocoder
 
-# Fonction pour convertir une adresse en coordonnées latitude/longitude
-def geocode_address(address):
-    geolocator = Nominatim(user_agent="geoapiExercises")
-    try:
-        location = geolocator.geocode(address)
-        # print(location.address)
-        return location.latitude, location.longitude
-    except Exception as e:
-        st.markdown(''' ## <font color='red'>🚨🚨 ERREUR DANS L'ADRESSE 🚨🚨</font>''', unsafe_allow_html=True)
-        print(e)
-        pass
-
-def get_latitude_longitude(address):
-    try:
-        g = geocoder.osm(address)
-        return tuple(g.latlng)
-    except Exception as e:
-            st.markdown(''' ## <font color='red'>🚨🚨 ERREUR DANS L'ADRESSE 🚨🚨</font>''', unsafe_allow_html=True)
-            print(e)
-            pass
-
 
 def recherche():
     
@@ -39,11 +18,11 @@ def recherche():
         ''')
 
     # Saisie de l'adresse postale
-    cp = st.text_input("Code postal", "", key="cp")
-    country = st.text_input(label="Pays", value="France", key="country")
-    country = country.replace("é", "e").upper()
+    cp = st.text_input("Code postal et/ou Ville", "", key="cp")
+    # country = st.text_input(label="Pays", value="France", key="country")
+    # country = country.replace("é", "e").upper()
     num_voie = st.text_input("N° et rue", "", key="Adresse").lower()
-    address = f'{num_voie.replace("é", "e").replace("è", "e").lower()}, {cp}, {country}'
+    address = f'{num_voie.replace("é", "e").replace("è", "e").lower()}, {cp}, France'
     dt_deb = st.date_input("date de début",  label_visibility='visible', key="deb", value=fc.pd.to_datetime("2018-12-31"))
     dt_fin = st.date_input(label="date de fin", label_visibility='visible', key="fin")
 
@@ -53,7 +32,7 @@ def recherche():
     if st.button("Rechercher") and address!="":
         # Convertir l'adresse en coordonnées
         try:
-            latitude, longitude = get_latitude_longitude(address)
+            latitude, longitude = fc.get_latitude_longitude(address)
         except:
             latitude, longitude  = (48.8582532, 2.294287)
             st.markdown('''
