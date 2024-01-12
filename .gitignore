@@ -8,7 +8,7 @@
 brouillon.ipynb
 .brouillon.py
 .streamlit/secrets.toml
-
+data/raw/
 ### Flask app ###
 instance/*
 !instance/.gitignore

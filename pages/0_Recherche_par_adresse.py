@@ -1,6 +1,6 @@
 from Accueil import *
 import fonctions as fc
-import geocoder
+
 
 
 def recherche():
