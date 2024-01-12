@@ -7,7 +7,7 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 from babel.dates import format_date
-
+import geocoder
 
 # funcion qui permet de s'assurer que les clés des dictionnaire sont bien les integer
 # utilisé dans le tableau 
@@ -153,12 +153,9 @@ def stat_loc_data(implique1, df1, df12, df13):
     # Afficher les résultats sur une carte
     st.title("🌍 Localisation géographique 🌍")        
     # Création de la carte
-    map = folium.Map(location=[df1['Latitude'], df1['Longitude']], zoom_start=13)
-    folium.Marker([df1['Latitude'], df1['Longitude']], popup=df1.Adresse_postale, tooltip="<strong>"f'{df1.Adresse_postale}'"</strong>", 
+    map = folium.Map(location=[df1['Latitude']+0.5153, df1['Longitude']+0.2382], zoom_start=13)
+    folium.Marker([df1['Latitude']+0.5153, df1['Longitude']+0.2382], popup=df1.Adresse_postale, tooltip="<strong>"f'{df1.Adresse_postale}'"</strong>", 
                 icon=folium.Icon(color='red')).add_to(map)
-    # Ajouter les marqueurs pour les accidents
-    # for _ , accident in acc[['Latitude', 'Longitude']].iterrows():
-    #     folium.Marker([accident['Latitude'], accident['Longitude']]).add_to(map)
 
     map.save("static/carte.html")
 
@@ -168,11 +165,6 @@ def stat_loc_data(implique1, df1, df12, df13):
     st.write('''   ''')
 
     st.write('''   ''')
-
-    st.write(''' # Données de l'accident ''', df1)
-    st.write(implique1.Nombre[0]," usagers impliqués ", implique1)
-    
-    tb(df12, df13)
 
     return None
     

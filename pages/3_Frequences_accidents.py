@@ -28,5 +28,3 @@ for titre in df7.columns:
         ax.set_xticklabels(ax.get_xticklabels(), rotation = 90)
 
         st.pyplot(fig)
-
-st.table(df7)
