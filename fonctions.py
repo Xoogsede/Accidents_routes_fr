@@ -164,7 +164,6 @@ def stat_loc_data(implique1, df1, df12, df13):
 
     folium_static(map, width=_max_width_(80), height=800)          
 
-
     st.write('''   ''')
 
     st.write('''   ''')
