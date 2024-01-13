@@ -7,6 +7,7 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 from babel.dates import format_date
+from geopy import Nominatim
 import geocoder
 
 # funcion qui permet de s'assurer que les clés des dictionnaire sont bien les integer
@@ -133,6 +134,8 @@ def stat_loc_data(implique1, df1, df12, df13):
 
     # st.write(df1)
     annee_accid = df1['DateTime'].dt.year[0]
+    df12['an_nais'] = pd.to_numeric(df12['an_nais'], errors='coerce')
+    df12['an_nais'] = df12['an_nais'].astype(int)
     df12['age'] = annee_accid - df12['an_nais']
     df12.insert(0, 'age', df12.pop('age'), allow_duplicates=False)
 
