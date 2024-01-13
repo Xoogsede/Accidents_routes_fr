@@ -56,14 +56,14 @@ query7 = f'''
 MATCH (a:Accident) RETURN a.`Département` as Departement, count(*) as nb_victimes ORDER BY nb_victimes DESC LIMIT 5
 '''
 
-# Classement des fréquences d'accident par année et mois entre 2019 et 2021 
+# Classement des fréquences d'accident par année et mois entre 2019 et 2022
 query8 = f'''
 MATCH (n:Accident) 
 RETURN n.An as Annee,n.Mois AS mois, COUNT (*) AS nombre_accident 
 ORDER BY nombre_accident DESC;'''
 
 
-# Classement des fréquences d'accident par année et mois entre 2019 et 2021 en fonction du nombre de personnes impliquées et de leur état
+# Classement des fréquences d'accident par année et mois entre 2019 et 2022 en fonction du nombre de personnes impliquées et de leur état
 query9 = f'''
 MATCH (u:Usager)-[r:EST_CONCERNE]->(a:Accident)
 RETURN ToInteger(a.An) AS Annee,ToInteger(a.Mois) AS mois, 
